@@ -1,0 +1,108 @@
+{
+  "name": "@dolasoft/logger",
+  "version": "1.0.0",
+  "description": "Enterprise-grade logging library with multiple adapters and framework integrations",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/integrations/react.d.ts",
+      "import": "./dist/integrations/react.esm.js",
+      "require": "./dist/integrations/react.js"
+    },
+    "./nextjs": {
+      "types": "./dist/integrations/nextjs.d.ts",
+      "import": "./dist/integrations/nextjs.esm.js",
+      "require": "./dist/integrations/nextjs.js"
+    },
+    "./nextjs-client": {
+      "types": "./dist/integrations/nextjs-client.d.ts",
+      "import": "./dist/integrations/nextjs-client.esm.js",
+      "require": "./dist/integrations/nextjs-client.js"
+    },
+    "./express": {
+      "types": "./dist/integrations/express.d.ts",
+      "import": "./dist/integrations/express.esm.js",
+      "require": "./dist/integrations/express.js"
+    }
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest run",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run test:run",
+    "release": "npm run build && npm publish"
+  },
+  "keywords": [
+    "logger",
+    "logging",
+    "enterprise",
+    "typescript",
+    "react",
+    "nextjs",
+    "express",
+    "nodejs",
+    "monitoring",
+    "debugging"
+  ],
+  "author": {
+    "name": "DolaSoft",
+    "url": "https://github.com/dolasoft"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dolasoft/-dolasoft-logger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dolasoft/-dolasoft-logger/issues"
+  },
+  "homepage": "https://github.com/dolasoft/-dolasoft-logger#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "next": ">=12.0.0",
+    "react": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@testing-library/react": "^14.0.0",
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.37",
+    "@vitest/ui": "^3.2.4",
+    "jsdom": "^27.0.0",
+    "rollup": "^4.4.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2",
+    "vitest": "^3.2.4"
+  }
+}

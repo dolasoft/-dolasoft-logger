@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolaSoft Logger - Browser Example</title>
+</head>
+<body>
+    <h1>DolaSoft Logger Browser Example</h1>
+    <button id="infoBtn">Log Info</button>
+    <button id="warnBtn">Log Warning</button>
+    <button id="errorBtn">Log Error</button>
+    <button id="debugBtn">Log Debug</button>
+    
+    <div id="output"></div>
+
+    <script type="module">
+        // ES6 module import (if using a bundler)
+        import { getLogger, LogLevel, LogStrategy } from '@dolasoft/logger';
+        
+        // Or use the UMD build for direct browser usage
+        // const { getLogger, LogLevel, LogStrategy } = window.DolaSoftLogger;
+        
+        // Create logger instance
+        const logger = getLogger({
+            strategy: LogStrategy.CONSOLE,
+            level: LogLevel.DEBUG,
+            enableConsole: true
+        });
+        
+        // Get DOM elements
+        const infoBtn = document.getElementById('infoBtn');
+        const warnBtn = document.getElementById('warnBtn');
+        const errorBtn = document.getElementById('errorBtn');
+        const debugBtn = document.getElementById('debugBtn');
+        const output = document.getElementById('output');
+        
+        // Add event listeners
+        infoBtn.addEventListener('click', () => {
+            logger.info('Info button clicked', {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            });
+            output.innerHTML += '<p>Info logged - check console</p>';
+        });
+        
+        warnBtn.addEventListener('click', () => {
+            logger.warn('Warning button clicked', {
+                warning: 'This is a test warning',
+                severity: 'medium'
+            });
+            output.innerHTML += '<p>Warning logged - check console</p>';
+        });
+        
+        errorBtn.addEventListener('click', () => {
+            const error = new Error('Test error from button click');
+            logger.error('Error button clicked', error, {
+                errorType: 'user_action',
+                buttonId: 'errorBtn'
+            });
+            output.innerHTML += '<p>Error logged - check console</p>';
+        });
+        
+        debugBtn.addEventListener('click', () => {
+            logger.debug('Debug button clicked', {
+                debugInfo: 'This is debug information',
+                stackTrace: new Error().stack
+            });
+            output.innerHTML += '<p>Debug logged - check console</p>';
+        });
+        
+        // Log page load
+        logger.info('Page loaded', {
+            url: window.location.href,
+            referrer: document.referrer,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Error handling
+        window.addEventListener('error', (event) => {
+            logger.error('Global error caught', event.error, {
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno
+            });
+        });
+        
+        // Unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            logger.error('Unhandled promise rejection', new Error(event.reason), {
+                promise: event.promise.toString()
+            });
+        });
+        
+        console.log('DolaSoft Logger initialized successfully!');
+    </script>
+</body>
+</html>
