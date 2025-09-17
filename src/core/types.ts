@@ -39,6 +39,8 @@ export interface LoggerConfig {
   enableConsole?: boolean;
   enableDatabase?: boolean;
   enableFile?: boolean;
+  enableMemory?: boolean;
+  enableRemote?: boolean;
   databaseTable?: string;
   filePath?: string;
   maxFileSize?: number; // in bytes
@@ -46,6 +48,9 @@ export interface LoggerConfig {
   format?: 'json' | 'text' | 'pretty';
   includeStack?: boolean;
   includeMetadata?: boolean;
+  includeTimestamp?: boolean;
+  includeLevel?: boolean;
+  remoteEndpoint?: string;
 }
 
 export interface LogAdapter {

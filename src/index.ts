@@ -18,6 +18,32 @@ export {
   createNextJSClientLogger 
 } from './integrations/nextjs-client';
 export { 
+  SimpleLoggerProvider,
+  useSimpleLogger
+} from './integrations/simple-logger-provider';
+export { 
+  ZeroConfigLoggerProvider,
+  useZeroConfigLogger as useZeroConfigLoggerLegacy
+} from './integrations/zero-config-logger';
+export { 
+  Loggers,
+  createConsoleLogger,
+  createMemoryLogger,
+  createFileLogger,
+  createRemoteLogger,
+  createHybridLogger,
+  createSmartLogger
+} from './integrations/zero-config-adapters';
+export { 
+  ConsoleProvider,
+  MemoryProvider,
+  FileProvider,
+  RemoteProvider,
+  HybridProvider,
+  SmartProvider,
+  useLogger as useZeroConfigLogger
+} from './integrations/zero-config-react-providers';
+export { 
   createLoggingMiddleware, 
   createErrorHandler, 
   createExpressLogger 
