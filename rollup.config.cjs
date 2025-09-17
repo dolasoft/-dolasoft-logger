@@ -66,21 +66,6 @@ module.exports = [
     plugins: getPlugins(),
     external: ['react', 'next', 'crypto']
   },
-  // Browser build (UMD for script tags)
-  {
-    input: 'src/index.ts',
-    output: [
-      {
-        file: 'dist/browser.js',
-        format: 'umd',
-        name: 'DolaSoftLogger',
-        sourcemap: true,
-        exports: 'named'
-      }
-    ],
-    plugins: getPlugins(),
-    external: ['react', 'crypto', 'fs', 'path']
-  },
   // Type definitions
   {
     input: 'dist/index.d.ts',
