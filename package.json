@@ -12,6 +12,10 @@
   "files": [
     "dist",
     "README.md",
+    "API_REFERENCE.md",
+    "EXAMPLES.md",
+    "CONTRIBUTING.md",
+    "TESTING.md",
     "LICENSE"
   ],
   "exports": {

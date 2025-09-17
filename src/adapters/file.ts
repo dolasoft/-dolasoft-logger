@@ -5,7 +5,8 @@ let fs: any;
 let path: any;
 
 const getNodeModules = () => {
-  if (typeof window !== 'undefined') {
+  // Check if we're in a browser environment (not just any environment with window)
+  if (typeof window !== 'undefined' && typeof process === 'undefined') {
     throw new Error('FileAdapter can only be used in Node.js environment');
   }
   if (!fs || !path) {
