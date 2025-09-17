@@ -59,6 +59,7 @@
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
+    "test:browser": "node tests/run-browser-tests.cjs",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx --fix",
     "prepublishOnly": "npm run build:prod && npm run test:run",

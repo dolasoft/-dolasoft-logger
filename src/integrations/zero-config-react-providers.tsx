@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
-import { Loggers } from './zero-config-adapters';
+import { Loggers } from './zero-config-adapters-browser';
 import { BaseZeroConfigLoggerProvider, useBaseZeroConfigLogger } from './base-zero-config-provider';
 import { LogLevel, LogStrategy } from '../core/types';
 

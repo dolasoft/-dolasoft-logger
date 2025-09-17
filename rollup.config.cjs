@@ -66,13 +66,14 @@ module.exports = [
     plugins: getPlugins(),
     external: ['react', 'next', 'crypto']
   },
-  // Browser build (excludes Node.js-only features)
+  // Browser build (excludes Node.js-only features) - UMD format for browser
   {
     input: 'src/browser.ts',
     output: [
       {
         file: 'dist/browser.js',
-        format: 'cjs',
+        format: 'umd',
+        name: 'DolaSoftLogger',
         sourcemap: true,
         exports: 'named'
       },
@@ -84,6 +85,26 @@ module.exports = [
     ],
     plugins: getPlugins(),
     external: ['react', 'next', 'crypto', 'fs', 'path']
+  },
+  // Browser core build (no React dependencies) - UMD format for browser
+  {
+    input: 'src/browser-core.ts',
+    output: [
+      {
+        file: 'dist/browser-core.js',
+        format: 'umd',
+        name: 'DolaSoftLoggerCore',
+        sourcemap: true,
+        exports: 'named'
+      },
+      {
+        file: 'dist/browser-core.esm.js',
+        format: 'esm',
+        sourcemap: true
+      }
+    ],
+    plugins: getPlugins(),
+    external: ['crypto', 'fs', 'path']
   },
   // React integration
   {
@@ -171,6 +192,12 @@ module.exports = [
   {
     input: 'dist/browser.d.ts',
     output: [{ file: 'dist/browser.d.ts', format: 'esm' }],
+    plugins: [dts()],
+    external: [/\.css$/]
+  },
+  {
+    input: 'dist/browser-core.d.ts',
+    output: [{ file: 'dist/browser-core.d.ts', format: 'esm' }],
     plugins: [dts()],
     external: [/\.css$/]
   },

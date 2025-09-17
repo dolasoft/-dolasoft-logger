@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { LoggerService } from '../core';
+import { ILoggerService } from '../core/types';
 
 interface BaseZeroConfigLoggerContextType {
   logger: {
@@ -23,7 +23,7 @@ interface BaseZeroConfigLoggerProviderProps {
   appSlug?: string;
   userId?: string;
   requestId?: string;
-  logger: LoggerService;
+  logger: ILoggerService;
 }
 
 export class BaseZeroConfigLoggerProvider extends React.Component<BaseZeroConfigLoggerProviderProps> {

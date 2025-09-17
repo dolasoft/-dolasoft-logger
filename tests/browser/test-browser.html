@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolaSoft Logger Browser Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success {
+            color: #28a745;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DolaSoft Logger Browser Test</h1>
+        <p>Testing the browser bundle to ensure it works correctly without Node.js dependencies.</p>
+        
+        <div class="test-section">
+            <h3>Test Controls</h3>
+            <button onclick="testBasicImports()">Test Basic Imports</button>
+            <button onclick="testUUIDGeneration()">Test UUID Generation</button>
+            <button onclick="testLoggerCreation()">Test Logger Creation</button>
+            <button onclick="testLogging()">Test Logging</button>
+            <button onclick="testZeroConfigLoggers()">Test Zero-Config Loggers</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Results</h3>
+            <div id="output">Click a test button to start testing...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        let logger, browserCore;
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            output.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        async function testBasicImports() {
+            log('🧪 Testing basic imports...', 'info');
+            try {
+                // Test loading the UMD browser-core bundle
+                const script = document.createElement('script');
+                script.src = '../../dist/browser-core.js';
+                script.onload = () => {
+                    browserCore = window.DolaSoftLoggerCore;
+                    log('✅ Successfully loaded browser-core UMD bundle', 'success');
+                    checkExports();
+                };
+                script.onerror = () => {
+                    log('❌ Error loading browser-core UMD bundle', 'error');
+                };
+                document.head.appendChild(script);
+            } catch (error) {
+                log('❌ Error importing browser-core: ' + error.message, 'error');
+                console.error('Import error:', error);
+            }
+        }
+
+        function checkExports() {
+            // Check available exports
+            const exports = Object.keys(browserCore);
+            log(`📦 Available exports: ${exports.length} items`, 'info');
+            log(`   ${exports.slice(0, 10).join(', ')}${exports.length > 10 ? '...' : ''}`, 'info');
+            
+            // Test specific exports
+            if (browserCore.generateUUID) {
+                log('✅ generateUUID function available', 'success');
+            } else {
+                log('❌ generateUUID function not found', 'error');
+            }
+            
+            if (browserCore.getLogger) {
+                log('✅ getLogger function available', 'success');
+            } else {
+                log('❌ getLogger function not found', 'error');
+            }
+        }
+
+        async function testUUIDGeneration() {
+            log('🧪 Testing UUID generation...', 'info');
+            try {
+                if (!browserCore) {
+                    log('❌ Browser core not loaded. Run "Test Basic Imports" first.', 'error');
+                    return;
+                }
+                
+                const uuid1 = browserCore.generateUUID();
+                const uuid2 = browserCore.generateUUID();
+                
+                log(`✅ Generated UUID 1: ${uuid1}`, 'success');
+                log(`✅ Generated UUID 2: ${uuid2}`, 'success');
+                log(`✅ UUIDs are different: ${uuid1 !== uuid2}`, 'success');
+                log(`✅ UUID format valid: ${/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid1)}`, 'success');
+                
+                // Test short ID
+                const shortId = browserCore.generateShortId();
+                log(`✅ Generated short ID: ${shortId}`, 'success');
+                
+            } catch (error) {
+                log(`❌ Error generating UUID: ${error.message}`, 'error');
+                console.error('UUID generation error:', error);
+            }
+        }
+
+        async function testLoggerCreation() {
+            log('🧪 Testing logger creation...', 'info');
+            try {
+                if (!browserCore) {
+                    log('❌ Browser core not loaded. Run "Test Basic Imports" first.', 'error');
+                    return;
+                }
+                
+                // Test default logger
+                logger = browserCore.getLogger();
+                log('✅ Default logger created successfully', 'success');
+                
+                // Test logger with config
+                const customLogger = browserCore.getLogger({
+                    level: browserCore.LogLevel.DEBUG,
+                    strategy: browserCore.LogStrategy.CONSOLE
+                });
+                log('✅ Custom logger created successfully', 'success');
+                
+                // Test logger methods
+                if (typeof logger.debug === 'function') {
+                    log('✅ Logger has debug method', 'success');
+                } else {
+                    log('❌ Logger missing debug method', 'error');
+                }
+                
+                if (typeof logger.info === 'function') {
+                    log('✅ Logger has info method', 'success');
+                } else {
+                    log('❌ Logger missing info method', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Error creating logger: ${error.message}`, 'error');
+                console.error('Logger creation error:', error);
+            }
+        }
+
+        async function testLogging() {
+            log('🧪 Testing logging functionality...', 'info');
+            try {
+                if (!logger) {
+                    log('❌ Logger not created. Run "Test Logger Creation" first.', 'error');
+                    return;
+                }
+                
+                // Test different log levels
+                logger.debug('This is a debug message', { userId: 'test-user' });
+                log('✅ Debug log sent', 'success');
+                
+                logger.info('This is an info message', { action: 'test' });
+                log('✅ Info log sent', 'success');
+                
+                logger.warn('This is a warning message', { warning: 'test-warning' });
+                log('✅ Warning log sent', 'success');
+                
+                logger.error('This is an error message', new Error('Test error'), { error: 'test-error' });
+                log('✅ Error log sent', 'success');
+                
+                // Test convenience functions
+                browserCore.logDebug('Convenience debug message');
+                browserCore.logInfo('Convenience info message');
+                browserCore.logWarn('Convenience warning message');
+                browserCore.logError('Convenience error message');
+                log('✅ Convenience functions work', 'success');
+                
+            } catch (error) {
+                log(`❌ Error during logging: ${error.message}`, 'error');
+                console.error('Logging error:', error);
+            }
+        }
+
+        async function testZeroConfigLoggers() {
+            log('🧪 Testing zero-config loggers...', 'info');
+            try {
+                if (!browserCore) {
+                    log('❌ Browser core not loaded. Run "Test Basic Imports" first.', 'error');
+                    return;
+                }
+                
+                // Test console logger
+                const consoleLogger = browserCore.createConsoleLogger();
+                log('✅ Console logger created', 'success');
+                
+                // Test memory logger
+                const memoryLogger = browserCore.createMemoryLogger();
+                log('✅ Memory logger created', 'success');
+                
+                // Test remote logger
+                const remoteLogger = browserCore.createRemoteLogger();
+                log('✅ Remote logger created', 'success');
+                
+                // Test hybrid logger
+                const hybridLogger = browserCore.createHybridLogger();
+                log('✅ Hybrid logger created', 'success');
+                
+                // Test smart logger
+                const smartLogger = browserCore.createSmartLogger();
+                log('✅ Smart logger created', 'success');
+                
+                // Test Loggers object
+                if (browserCore.Loggers) {
+                    log('✅ Loggers object available', 'success');
+                    const loggerNames = Object.keys(browserCore.Loggers);
+                    log(`   Available loggers: ${loggerNames.join(', ')}`, 'info');
+                } else {
+                    log('❌ Loggers object not found', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Error testing zero-config loggers: ${error.message}`, 'error');
+                console.error('Zero-config logger error:', error);
+            }
+        }
+
+        // Make functions available globally
+        window.testBasicImports = testBasicImports;
+        window.testUUIDGeneration = testUUIDGeneration;
+        window.testLoggerCreation = testLoggerCreation;
+        window.testLogging = testLogging;
+        window.testZeroConfigLoggers = testZeroConfigLoggers;
+        window.clearOutput = clearOutput;
+
+        // Auto-run basic test on load
+        window.addEventListener('load', () => {
+            log('🚀 Browser test page loaded. Click "Test Basic Imports" to start.', 'info');
+        });
+    </script>
+</body>
+</html>

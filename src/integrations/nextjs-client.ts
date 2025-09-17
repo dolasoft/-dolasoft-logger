@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { ClientLoggerService } from '../core/client-logger';
+import { LoggerService } from '../core/browser-logger';
 import { LogLevel, LogStrategy } from '../core/types';
 import type { LogMethod, ErrorLogMethod } from '../core/types';
 import { generateRequestId as _generateRequestId } from '../utils/uuid';
@@ -9,7 +9,7 @@ interface NextJSClientLoggerOptions {
   appSlug?: string;
   userId?: string;
   requestId?: string;
-  logger?: ClientLoggerService;
+  logger?: LoggerService;
   enableConsole?: boolean;
   enableRemote?: boolean;
   remoteEndpoint?: string;
@@ -33,7 +33,7 @@ export function useNextJSClientLogger(options: NextJSClientLoggerOptions = {}) {
     maxMemoryEntries = 100 // Reduce default memory entries for production
   } = options;
 
-  const loggerRef = useRef<ClientLoggerService | null>(null);
+  const loggerRef = useRef<LoggerService | null>(null);
 
   // Initialize logger on client side
   useEffect(() => {
@@ -42,7 +42,7 @@ export function useNextJSClientLogger(options: NextJSClientLoggerOptions = {}) {
     // Production should NEVER use console logging
     const shouldEnableConsole = enableConsole && isDevelopment();
     
-    const clientLogger = logger || ClientLoggerService.getInstance({
+    const clientLogger = logger || LoggerService.getInstance({
       strategy,
       level,
       enableConsole: shouldEnableConsole,
@@ -155,7 +155,7 @@ export function useNextJSClientLogger(options: NextJSClientLoggerOptions = {}) {
 
 // Client-side logger class for non-React usage
 export class NextJSClientLogger {
-  private logger: ClientLoggerService;
+  private logger: LoggerService;
   private appSlug?: string;
   private userId?: string;
   private requestId?: string;
@@ -185,7 +185,7 @@ export class NextJSClientLogger {
     // Production should NEVER use console logging
     const shouldEnableConsole = enableConsole && isDevelopment();
 
-    this.logger = logger || ClientLoggerService.getInstance({
+    this.logger = logger || LoggerService.getInstance({
       strategy,
       level,
       enableConsole: shouldEnableConsole,

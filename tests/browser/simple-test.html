@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolaSoft Logger - Simple Browser Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        #output {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            min-height: 200px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 DolaSoft Logger - Simple Browser Test</h1>
+        <p>This page tests the UMD browser bundle directly.</p>
+        
+        <div class="test-section">
+            <h3>Test Controls</h3>
+            <button onclick="testBasicLoading()">Test Basic Loading</button>
+            <button onclick="testLoggerCreation()">Test Logger Creation</button>
+            <button onclick="testLogging()">Test Logging</button>
+            <button onclick="testUUID()">Test UUID Generation</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Results</h3>
+            <div id="output">Click "Test Basic Loading" to start...</div>
+        </div>
+    </div>
+
+    <!-- Load the UMD bundle -->
+    <script src="../../dist/browser-core.js"></script>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        function testBasicLoading() {
+            log('🧪 Testing basic loading...', 'info');
+            
+            // Check if the global was created
+            if (typeof window.DolaSoftLoggerCore !== 'undefined') {
+                log('✅ DolaSoftLoggerCore global loaded', 'success');
+                
+                const exports = Object.keys(window.DolaSoftLoggerCore);
+                log(`📦 Available exports: ${exports.length} items`, 'info');
+                log(`   ${exports.slice(0, 10).join(', ')}${exports.length > 10 ? '...' : ''}`, 'info');
+                
+                // Test specific exports
+                if (window.DolaSoftLoggerCore.generateUUID) {
+                    log('✅ generateUUID function available', 'success');
+                } else {
+                    log('❌ generateUUID function not found', 'error');
+                }
+                
+                if (window.DolaSoftLoggerCore.getLogger) {
+                    log('✅ getLogger function available', 'success');
+                } else {
+                    log('❌ getLogger function not found', 'error');
+                }
+            } else {
+                log('❌ DolaSoftLoggerCore global not found', 'error');
+            }
+        }
+
+        function testLoggerCreation() {
+            log('🔧 Testing logger creation...', 'info');
+            
+            if (typeof window.DolaSoftLoggerCore === 'undefined') {
+                log('❌ DolaSoftLoggerCore not loaded. Run "Test Basic Loading" first.', 'error');
+                return;
+            }
+            
+            try {
+                const logger = window.DolaSoftLoggerCore.getLogger();
+                log('✅ Logger created successfully', 'success');
+                log(`   Logger type: ${typeof logger}`, 'info');
+                
+                // Test logger methods
+                if (typeof logger.debug === 'function') {
+                    log('✅ debug method available', 'success');
+                } else {
+                    log('❌ debug method not found', 'error');
+                }
+                
+                if (typeof logger.info === 'function') {
+                    log('✅ info method available', 'success');
+                } else {
+                    log('❌ info method not found', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Error creating logger: ${error.message}`, 'error');
+            }
+        }
+
+        function testLogging() {
+            log('📝 Testing logging functionality...', 'info');
+            
+            if (typeof window.DolaSoftLoggerCore === 'undefined') {
+                log('❌ DolaSoftLoggerCore not loaded. Run "Test Basic Loading" first.', 'error');
+                return;
+            }
+            
+            try {
+                const logger = window.DolaSoftLoggerCore.getLogger();
+                
+                // Test different log levels
+                logger.debug('This is a debug message', { test: true });
+                log('✅ Debug log sent', 'success');
+                
+                logger.info('This is an info message', { test: true });
+                log('✅ Info log sent', 'success');
+                
+                logger.warn('This is a warning message', { test: true });
+                log('✅ Warning log sent', 'success');
+                
+                logger.error('This is an error message', new Error('Test error'), { test: true });
+                log('✅ Error log sent', 'success');
+                
+            } catch (error) {
+                log(`❌ Error during logging: ${error.message}`, 'error');
+            }
+        }
+
+        function testUUID() {
+            log('🔑 Testing UUID generation...', 'info');
+            
+            if (typeof window.DolaSoftLoggerCore === 'undefined') {
+                log('❌ DolaSoftLoggerCore not loaded. Run "Test Basic Loading" first.', 'error');
+                return;
+            }
+            
+            try {
+                const uuid = window.DolaSoftLoggerCore.generateUUID();
+                log(`✅ UUID generated: ${uuid}`, 'success');
+                
+                const shortId = window.DolaSoftLoggerCore.generateShortId();
+                log(`✅ Short ID generated: ${shortId}`, 'success');
+                
+                const requestId = window.DolaSoftLoggerCore.generateRequestId();
+                log(`✅ Request ID generated: ${requestId}`, 'success');
+                
+            } catch (error) {
+                log(`❌ Error generating UUIDs: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run basic loading test when page loads
+        window.addEventListener('load', () => {
+            log('🚀 Page loaded. Testing basic loading...', 'info');
+            testBasicLoading();
+        });
+    </script>
+</body>
+</html>

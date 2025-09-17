@@ -1,20 +1,35 @@
 import { LoggerConfig, LogLevel, LogStrategy } from './types';
 
+// Helper function to safely access process.env
+function getEnvVar(key: string, defaultValue: string): string {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key] || defaultValue;
+  }
+  return defaultValue;
+}
+
+function isProduction(): boolean {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.NODE_ENV === 'production';
+  }
+  return false;
+}
+
 // Default configuration
 export const DEFAULT_CONFIG: LoggerConfig = {
-  strategy: process.env.NODE_ENV === 'production' ? LogStrategy.HYBRID : LogStrategy.CONSOLE,
-  level: process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.DEBUG,
-  maxMemoryEntries: parseInt(process.env.LOG_MAX_MEMORY_ENTRIES || '1000'),
-  maxDatabaseEntries: parseInt(process.env.LOG_MAX_DATABASE_ENTRIES || '10000'),
-  maxFileEntries: parseInt(process.env.LOG_MAX_FILE_ENTRIES || '5000'),
-  enableConsole: process.env.NODE_ENV !== 'production',
+  strategy: isProduction() ? LogStrategy.HYBRID : LogStrategy.CONSOLE,
+  level: isProduction() ? LogLevel.WARN : LogLevel.DEBUG,
+  maxMemoryEntries: parseInt(getEnvVar('LOG_MAX_MEMORY_ENTRIES', '1000')),
+  maxDatabaseEntries: parseInt(getEnvVar('LOG_MAX_DATABASE_ENTRIES', '10000')),
+  maxFileEntries: parseInt(getEnvVar('LOG_MAX_FILE_ENTRIES', '5000')),
+  enableConsole: !isProduction(),
   enableDatabase: true,
-  enableFile: process.env.NODE_ENV === 'production',
+  enableFile: isProduction(),
   databaseTable: 'error_logs',
-  filePath: process.env.LOG_FILE_PATH || './logs/app.log',
-  maxFileSize: parseInt(process.env.LOG_MAX_FILE_SIZE || '10485760'), // 10MB
-  maxFiles: parseInt(process.env.LOG_MAX_FILES || '5'),
-  format: process.env.NODE_ENV === 'production' ? 'json' : 'pretty',
+  filePath: getEnvVar('LOG_FILE_PATH', './logs/app.log'),
+  maxFileSize: parseInt(getEnvVar('LOG_MAX_FILE_SIZE', '10485760')), // 10MB
+  maxFiles: parseInt(getEnvVar('LOG_MAX_FILES', '5')),
+  format: isProduction() ? 'json' : 'pretty',
   includeStack: true,
   includeMetadata: true
 };

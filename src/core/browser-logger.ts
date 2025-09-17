@@ -1,15 +1,16 @@
-import { LogLevel, LogStrategy, LogEntry, LoggerConfig, LogAdapter, LogStats } from './types';
+import { LogLevel, LogStrategy, LogEntry, LoggerConfig, LogAdapter, LogStats, ILoggerService } from './types';
 import { createConfig, validateConfig } from './config';
 import { ConsoleAdapter } from '../adapters/console';
 import { MemoryAdapter } from '../adapters/memory';
+import { DatabaseAdapter } from '../adapters/database';
+// FileAdapter excluded - Node.js only
 import { generateUUID } from '../utils/uuid';
 
-/**
- * Client-side logger service that only includes browser-compatible adapters
- * (Console and Memory adapters only - no File or Database adapters)
- */
-export class ClientLoggerService {
-  private static instance: ClientLoggerService | null = null;
+// Re-export types for browser usage
+export type { LogLevel, LogStrategy, LogEntry, LoggerConfig, LogAdapter, LogStats, ILoggerService } from './types';
+
+export class LoggerService implements ILoggerService {
+  private static instance: LoggerService | null = null;
   private config: LoggerConfig;
   private adapters: Map<string, LogAdapter> = new Map();
 
@@ -21,40 +22,50 @@ export class ClientLoggerService {
     if (errors.length > 0) {
       throw new Error(`Invalid logger configuration: ${errors.join(', ')}`);
     }
-
+    
     this.initializeAdapters();
   }
 
-  static getInstance(config: Partial<LoggerConfig> = {}): ClientLoggerService {
-    if (!ClientLoggerService.instance) {
-      ClientLoggerService.instance = new ClientLoggerService(config);
+  static getInstance(config?: Partial<LoggerConfig>): LoggerService {
+    if (!LoggerService.instance) {
+      LoggerService.instance = new LoggerService(config);
     }
-    return ClientLoggerService.instance;
+    return LoggerService.instance;
   }
 
-  static create(config: Partial<LoggerConfig> = {}): ClientLoggerService {
-    return new ClientLoggerService(config);
+  static create(config: Partial<LoggerConfig> = {}): LoggerService {
+    return new LoggerService(config);
   }
 
   static reset(): void {
-    if (ClientLoggerService.instance) {
-      ClientLoggerService.instance.cleanup();
-      ClientLoggerService.instance = null;
+    if (LoggerService.instance) {
+      LoggerService.instance.cleanup();
+      LoggerService.instance = null;
     }
   }
 
   private initializeAdapters(): void {
-    // Only initialize browser-compatible adapters
+    // Console adapter
     if (this.config.enableConsole) {
       const consoleAdapter = new ConsoleAdapter();
       consoleAdapter.configure(this.config);
       this.adapters.set('console', consoleAdapter);
     }
 
-    // Always initialize memory adapter for client-side logging
+    // Memory adapter (always enabled for browser)
     const memoryAdapter = new MemoryAdapter();
     memoryAdapter.configure(this.config);
     this.adapters.set('memory', memoryAdapter);
+
+    // Database adapter
+    if (this.config.enableDatabase) {
+      const databaseAdapter = new DatabaseAdapter();
+      databaseAdapter.configure(this.config);
+      this.adapters.set('database', databaseAdapter);
+    }
+
+    // FileAdapter excluded - Node.js only
+    // Remote adapter would be handled by integrations
   }
 
   private shouldLog(level: LogLevel): boolean {
@@ -78,7 +89,8 @@ export class ClientLoggerService {
       metadata
     };
 
-    if (this.config.includeStack && error?.stack) {
+    // Add stack trace if error and stack is enabled
+    if (error && this.config.includeStack && error.stack) {
       entry.stack = error.stack;
     }
 
@@ -107,17 +119,24 @@ export class ClientLoggerService {
           promises.push(this.adapters.get('memory')!.log(entry));
         }
         break;
-      case LogStrategy.HYBRID:
-        // Only use console and memory for client-side
-        for (const adapter of this.adapters.values()) {
-          promises.push(adapter.log(entry));
+      case LogStrategy.DATABASE:
+        if (this.adapters.has('database')) {
+          promises.push(this.adapters.get('database')!.log(entry));
         }
         break;
-      default:
-        // For other strategies, fall back to memory
-        if (this.adapters.has('memory')) {
-          promises.push(this.adapters.get('memory')!.log(entry));
-        }
+      case LogStrategy.FILE:
+        // FileAdapter not available in browser
+        console.warn('FileAdapter not available in browser environment');
+        break;
+      case LogStrategy.HYBRID:
+        // Use all available adapters
+          for (const adapter of Array.from(this.adapters.values())) {
+            promises.push(adapter.log(entry));
+          }
+        break;
+      case LogStrategy.REMOTE:
+        // Remote logging handled by integrations
+        break;
     }
 
     await Promise.allSettled(promises);
@@ -151,19 +170,15 @@ export class ClientLoggerService {
   async getLogs(adapterName?: string, limit?: number): Promise<LogEntry[]> {
     if (adapterName && this.adapters.has(adapterName)) {
       const adapter = this.adapters.get(adapterName)!;
-      if ('getLogs' in adapter) {
-        const adapterWithGetLogs = adapter as LogAdapter & { getLogs: (limit?: number) => LogEntry[] };
-        return adapterWithGetLogs.getLogs(limit);
+      if ('query' in adapter) {
+        return (adapter as DatabaseAdapter).query({ limit });
       }
     }
 
     // Default to memory adapter
     if (this.adapters.has('memory')) {
-      const memoryAdapter = this.adapters.get('memory')!;
-      if ('getLogs' in memoryAdapter) {
-        const memoryAdapterWithGetLogs = memoryAdapter as LogAdapter & { getLogs: (limit?: number) => LogEntry[] };
-        return memoryAdapterWithGetLogs.getLogs(limit);
-      }
+      const memoryAdapter = this.adapters.get('memory') as MemoryAdapter;
+      return memoryAdapter.getLogs(limit);
     }
 
     return [];
@@ -178,18 +193,16 @@ export class ClientLoggerService {
     if (adapterName && this.adapters.has(adapterName)) {
       const adapter = this.adapters.get(adapterName)!;
       if ('clear' in adapter) {
-        const adapterWithClear = adapter as LogAdapter & { clear: () => void | Promise<void> };
-        await adapterWithClear.clear();
+        await (adapter as MemoryAdapter | DatabaseAdapter).clear();
       }
-    } else {
-      // Clear all adapters
-      for (const adapter of this.adapters.values()) {
-        if ('clear' in adapter) {
-          const adapterWithClear = adapter as LogAdapter & { clear: () => void | Promise<void> };
-          await adapterWithClear.clear();
+      } else {
+        // Clear all adapters
+        for (const adapter of Array.from(this.adapters.values())) {
+          if ('clear' in adapter) {
+            await (adapter as MemoryAdapter | DatabaseAdapter).clear();
+          }
         }
       }
-    }
   }
 
   getStats(): LogStats {
@@ -199,14 +212,13 @@ export class ClientLoggerService {
       file: 0,
       errors: 0,
       maxMemory: this.config.maxMemoryEntries || 1000,
-      maxDatabase: 0,
-      maxFile: 0
+      maxDatabase: this.config.maxDatabaseEntries || 10000,
+      maxFile: 0, // FileAdapter not available in browser
     };
 
-    for (const [name, adapter] of this.adapters) {
+    for (const [name, adapter] of Array.from(this.adapters)) {
       if ('getStats' in adapter) {
-        const adapterWithStats = adapter as LogAdapter & { getStats: () => { count?: number; errors?: number } };
-        const adapterStats = adapterWithStats.getStats();
+        const adapterStats = (adapter as MemoryAdapter | DatabaseAdapter).getStats();
         stats[name as keyof LogStats] = adapterStats.count || 0;
         if (adapterStats.errors) {
           stats.errors += adapterStats.errors;
@@ -220,7 +232,7 @@ export class ClientLoggerService {
   updateConfig(newConfig: Partial<LoggerConfig>): void {
     this.config = { ...this.config, ...newConfig };
     
-    // Reconfigure all adapters
+    // Update all adapters with new config
     for (const adapter of this.adapters.values()) {
       if (adapter.configure) {
         adapter.configure(this.config);
@@ -229,7 +241,7 @@ export class ClientLoggerService {
   }
 
   async cleanup(): Promise<void> {
-    for (const adapter of this.adapters.values()) {
+    for (const adapter of Array.from(this.adapters.values())) {
       if (adapter.cleanup) {
         await adapter.cleanup();
       }

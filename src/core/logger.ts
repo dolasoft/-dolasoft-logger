@@ -1,12 +1,25 @@
-import { LogLevel, LogStrategy, LogEntry, LoggerConfig, LogAdapter, LogStats } from './types';
+import { LogLevel, LogStrategy, LogEntry, LoggerConfig, LogAdapter, LogStats, ILoggerService } from './types';
 import { createConfig, validateConfig } from './config';
 import { ConsoleAdapter } from '../adapters/console';
 import { MemoryAdapter } from '../adapters/memory';
 import { DatabaseAdapter } from '../adapters/database';
-import { FileAdapter } from '../adapters/file';
+// Lazy loading function for FileAdapter - only in Node.js environments
+function getFileAdapter(): typeof import('../adapters/file').FileAdapter | null {
+  if (typeof process !== 'undefined' && process.versions?.node) {
+    try {
+      // Use require for Node.js environments only
+      return require('../adapters/file').FileAdapter;
+    } catch {
+      // FileAdapter not available
+      return null;
+    }
+  }
+  return null;
+}
+
 import { generateUUID } from '../utils/uuid';
 
-export class LoggerService {
+export class LoggerService implements ILoggerService {
   private static instance: LoggerService | null = null;
   private config: LoggerConfig;
   private adapters: Map<string, LogAdapter> = new Map();
@@ -70,11 +83,14 @@ export class LoggerService {
       this.adapters.set('database', databaseAdapter);
     }
 
-    // File adapter
+    // File adapter - lazy load only when needed
     if (this.config.enableFile) {
-      const fileAdapter = new FileAdapter();
-      fileAdapter.configure(this.config);
-      this.adapters.set('file', fileAdapter);
+      const FileAdapterClass = getFileAdapter();
+      if (FileAdapterClass) {
+        const fileAdapter = new FileAdapterClass();
+        fileAdapter.configure(this.config);
+        this.adapters.set('file', fileAdapter);
+      }
     }
   }
 
@@ -260,3 +276,6 @@ export class LoggerService {
     }
   }
 }
+
+// Re-export types
+export type { LogLevel, LogStrategy, LogEntry, LoggerConfig, LogAdapter, LogStats, ILoggerService } from './types';

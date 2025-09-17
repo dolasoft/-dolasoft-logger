@@ -86,6 +86,21 @@ export interface LogStats {
   maxFile: number;
 }
 
+// Shared interface for logger services to ensure compatibility
+export interface ILoggerService {
+  debug(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+  info(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+  warn(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+  error(message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+  fatal(message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+  getLogs(adapterName?: string, limit?: number): Promise<LogEntry[]>;
+  getErrorLogs(limit?: number): Promise<LogEntry[]>;
+  clearLogs(adapterName?: string): Promise<void>;
+  getStats(): LogStats;
+  updateConfig(config: Partial<LoggerConfig>): void;
+  cleanup(): Promise<void>;
+}
+
 export type LogMethod = (
   message: string,
   context?: Record<string, unknown>,

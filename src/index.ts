@@ -55,6 +55,12 @@ export { SingletonManager, resetAllSingletons, areSingletonsInitialized } from '
 
 // Create default logger instance
 import { LoggerService } from './core/logger';
+import { ServerLogger } from './integrations/nextjs';
+import { SingletonManager } from './utils/singleton-manager';
+
+// Register the main logger services with the singleton manager (Node.js only)
+SingletonManager.registerLoggerForEnvironment('main-logger', 'node', LoggerService);
+SingletonManager.registerLoggerForEnvironment('server-logger', 'node', ServerLogger);
 
 // Get singleton logger instance
 export function getLogger(config?: Partial<import('./core/types').LoggerConfig>): LoggerService {

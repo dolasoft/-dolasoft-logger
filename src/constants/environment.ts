@@ -13,26 +13,38 @@ export type Environment = typeof ENVIRONMENT[keyof typeof ENVIRONMENT];
  * Check if current environment is development
  */
 export const isDevelopment = (): boolean => {
-  return process.env.NODE_ENV === ENVIRONMENT.DEVELOPMENT;
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.NODE_ENV === ENVIRONMENT.DEVELOPMENT;
+  }
+  return true; // Default to development in browser
 };
 
 /**
  * Check if current environment is production
  */
 export const isProduction = (): boolean => {
-  return process.env.NODE_ENV === ENVIRONMENT.PRODUCTION;
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.NODE_ENV === ENVIRONMENT.PRODUCTION;
+  }
+  return false; // Default to not production in browser
 };
 
 /**
  * Check if current environment is test
  */
 export const isTest = (): boolean => {
-  return process.env.NODE_ENV === ENVIRONMENT.TEST;
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.NODE_ENV === ENVIRONMENT.TEST;
+  }
+  return false; // Default to not test in browser
 };
 
 /**
  * Get current environment
  */
 export const getCurrentEnvironment = (): Environment => {
-  return (process.env.NODE_ENV as Environment) || ENVIRONMENT.DEVELOPMENT;
+  if (typeof process !== 'undefined' && process.env) {
+    return (process.env.NODE_ENV as Environment) || ENVIRONMENT.DEVELOPMENT;
+  }
+  return ENVIRONMENT.DEVELOPMENT; // Default to development in browser
 };

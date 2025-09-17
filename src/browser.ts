@@ -1,6 +1,6 @@
 // Browser-specific exports (excludes Node.js-only adapters)
 // Core exports
-export { LoggerService } from './core/logger';
+export { LoggerService } from './core/browser-logger';
 export { createConfig, validateConfig } from './core/config';
 export * from './core/types';
 
@@ -11,37 +11,23 @@ export { DatabaseAdapter } from './adapters/database';
 // FileAdapter excluded - Node.js only
 
 // Integration exports
-export { useLogger } from './integrations/react';
-export { 
-  useNextJSClientLogger, 
-  NextJSClientLogger, 
-  createNextJSClientLogger 
-} from './integrations/nextjs-client';
-export { 
-  SimpleLoggerProvider,
-  useSimpleLogger
-} from './integrations/simple-logger-provider';
-export { 
-  ZeroConfigLoggerProvider,
-  useZeroConfigLogger as useZeroConfigLoggerLegacy
-} from './integrations/zero-config-logger';
 export { 
   Loggers,
   createConsoleLogger,
   createMemoryLogger,
-  // createFileLogger excluded - Node.js only
   createRemoteLogger,
   createHybridLogger,
   createSmartLogger
-} from './integrations/zero-config-adapters';
-export { 
+} from './integrations/zero-config-adapters-browser';
+// Zero-config React providers - conditionally exported
+// Note: These require React to be available in the environment
+export {
   ConsoleProvider,
   MemoryProvider,
-  // FileProvider excluded - Node.js only
   RemoteProvider,
   HybridProvider,
   SmartProvider,
-  useLogger as useZeroConfigLogger
+  useLogger
 } from './integrations/zero-config-react-providers';
 
 // Utility exports
@@ -49,7 +35,11 @@ export { generateUUID, generateShortId, generateRequestId } from './utils/uuid';
 export { SingletonManager, resetAllSingletons, areSingletonsInitialized } from './utils/singleton-manager';
 
 // Create default logger instance
-import { LoggerService } from './core/logger';
+import { LoggerService } from './core/browser-logger';
+import { SingletonManager } from './utils/singleton-manager';
+
+// Register the browser logger service with the singleton manager (browser only)
+SingletonManager.registerLoggerForEnvironment('browser-logger', 'browser', LoggerService);
 
 // Get singleton logger instance
 export function getLogger(config?: Partial<import('./core/types').LoggerConfig>): LoggerService {

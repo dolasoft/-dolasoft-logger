@@ -4,19 +4,20 @@
  * Falls back to Math.random() implementation for older environments
  */
 export function generateUUID(): string {
-  // Check for Node.js crypto.randomUUID (Node.js 15.6.0+)
-  if (typeof require !== 'undefined') {
-    try {
-      const { randomUUID } = require('crypto');
-      return randomUUID();
-    } catch {
-      // crypto module not available, fall through to browser check
-    }
-  }
-  
-  // Check for browser crypto.randomUUID (modern browsers)
+  // Check for browser crypto.randomUUID first (works in both browser and Node.js 15.6.0+)
   if (typeof globalThis !== 'undefined' && globalThis.crypto && globalThis.crypto.randomUUID) {
     return globalThis.crypto.randomUUID();
+  }
+  
+  // Check for Node.js crypto.randomUUID (Node.js 15.6.0+)
+  if (typeof process !== 'undefined' && process.versions?.node) {
+    try {
+      // Use dynamic require for Node.js environments
+      const crypto = require('crypto');
+      return crypto.randomUUID();
+    } catch {
+      // crypto module not available, fall through to fallback
+    }
   }
   
   // Fallback implementation using Math.random() for older environments
