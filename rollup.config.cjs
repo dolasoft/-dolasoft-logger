@@ -66,9 +66,9 @@ module.exports = [
     plugins: getPlugins(),
     external: ['react', 'next', 'crypto']
   },
-  // Browser build (excludes Node.js-only features) - UMD format for browser
+  // Browser build (UMD for script tags)
   {
-    input: 'src/browser.ts',
+    input: 'src/index.ts',
     output: [
       {
         file: 'dist/browser.js',
@@ -76,152 +76,15 @@ module.exports = [
         name: 'DolaSoftLogger',
         sourcemap: true,
         exports: 'named'
-      },
-      {
-        file: 'dist/browser.esm.js',
-        format: 'esm',
-        sourcemap: true
       }
     ],
     plugins: getPlugins(),
-    external: ['react', 'next', 'crypto', 'fs', 'path']
-  },
-  // Browser core build (no React dependencies) - UMD format for browser
-  {
-    input: 'src/browser-core.ts',
-    output: [
-      {
-        file: 'dist/browser-core.js',
-        format: 'umd',
-        name: 'DolaSoftLoggerCore',
-        sourcemap: true,
-        exports: 'named'
-      },
-      {
-        file: 'dist/browser-core.esm.js',
-        format: 'esm',
-        sourcemap: true
-      }
-    ],
-    plugins: getPlugins(),
-    external: ['crypto', 'fs', 'path']
-  },
-  // React integration
-  {
-    input: 'src/integrations/react.ts',
-    output: [
-      {
-        file: 'dist/integrations/react.js',
-        format: 'cjs',
-        sourcemap: true,
-        exports: 'named'
-      },
-      {
-        file: 'dist/integrations/react.esm.js',
-        format: 'esm',
-        sourcemap: true
-      }
-    ],
-    plugins: getPlugins(),
-    external: ['react']
-  },
-  // Next.js integration
-  {
-    input: 'src/integrations/nextjs.ts',
-    output: [
-      {
-        file: 'dist/integrations/nextjs.js',
-        format: 'cjs',
-        sourcemap: true,
-        exports: 'named'
-      },
-      {
-        file: 'dist/integrations/nextjs.esm.js',
-        format: 'esm',
-        sourcemap: true
-      }
-    ],
-    plugins: getPlugins(),
-    external: ['next']
-  },
-  // Next.js client integration
-  {
-    input: 'src/integrations/nextjs-client.ts',
-    output: [
-      {
-        file: 'dist/integrations/nextjs-client.js',
-        format: 'cjs',
-        sourcemap: true,
-        exports: 'named'
-      },
-      {
-        file: 'dist/integrations/nextjs-client.esm.js',
-        format: 'esm',
-        sourcemap: true
-      }
-    ],
-    plugins: getPlugins(),
-    external: ['react']
-  },
-  // Express integration
-  {
-    input: 'src/integrations/express.ts',
-    output: [
-      {
-        file: 'dist/integrations/express.js',
-        format: 'cjs',
-        sourcemap: true,
-        exports: 'named'
-      },
-      {
-        file: 'dist/integrations/express.esm.js',
-        format: 'esm',
-        sourcemap: true
-      }
-    ],
-    plugins: getPlugins(),
-    external: ['express']
+    external: ['react', 'crypto', 'fs', 'path']
   },
   // Type definitions
   {
     input: 'dist/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'esm' }],
-    plugins: [dts()],
-    external: [/\.css$/]
-  },
-  {
-    input: 'dist/browser.d.ts',
-    output: [{ file: 'dist/browser.d.ts', format: 'esm' }],
-    plugins: [dts()],
-    external: [/\.css$/]
-  },
-  {
-    input: 'dist/browser-core.d.ts',
-    output: [{ file: 'dist/browser-core.d.ts', format: 'esm' }],
-    plugins: [dts()],
-    external: [/\.css$/]
-  },
-  {
-    input: 'dist/integrations/react.d.ts',
-    output: [{ file: 'dist/integrations/react.d.ts', format: 'esm' }],
-    plugins: [dts()],
-    external: [/\.css$/]
-  },
-  {
-    input: 'dist/integrations/nextjs.d.ts',
-    output: [{ file: 'dist/integrations/nextjs.d.ts', format: 'esm' }],
-    plugins: [dts()],
-    external: [/\.css$/]
-  },
-  {
-    input: 'dist/integrations/nextjs-client.d.ts',
-    output: [{ file: 'dist/integrations/nextjs-client.d.ts', format: 'esm' }],
-    plugins: [dts()],
-    external: [/\.css$/]
-  },
-  {
-    input: 'dist/integrations/express.d.ts',
-    output: [{ file: 'dist/integrations/express.d.ts', format: 'esm' }],
     plugins: [dts()],
     external: [/\.css$/]
   }

@@ -38,13 +38,16 @@ console.log('✅ Build files found');
 // Run the Node.js test
 console.log('\n🔧 Running Node.js tests...');
 try {
-  execSync('node tests/browser/test-browser-core.cjs', { 
-    stdio: 'inherit',
-    cwd: path.join(__dirname, '..')
+  const result = execSync('node tests/browser/test-browser-core.mjs', { 
+    stdio: 'pipe',
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf8'
   });
+  console.log(result);
   console.log('✅ Node.js tests passed');
 } catch (error) {
   console.log('❌ Node.js tests failed');
+  console.log(error.stdout || error.message);
   process.exit(1);
 }
 

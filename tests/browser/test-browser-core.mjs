@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Test script for browser-core bundle
- * This tests the browser-core bundle in a Node.js environment
+ * Test script for browser-core bundle (ESM version)
+ * This tests the browser-core ESM bundle in a Node.js environment
  */
 
-console.log('🧪 Testing DolaSoft Logger Browser-Core Bundle');
-console.log('================================================');
-
 // Simulate browser environment
-global.window = {};
+global.window = global;
+global.self = global;
+global.globalThis = global;
 global.process = { 
   env: { 
     NODE_ENV: 'development',
@@ -18,20 +17,23 @@ global.process = {
     LOG_MAX_FILE_ENTRIES: '5000'
   } 
 };
-global.globalThis = { 
-  crypto: { 
+// Mock crypto for browser environment
+Object.defineProperty(global, 'crypto', {
+  value: { 
     randomUUID: () => 'browser-uuid-test-' + Math.random().toString(36).substring(2, 15)
-  } 
-};
+  },
+  writable: true,
+  configurable: true
+});
 
 let browserCore;
 let logger;
 
-function testBasicImports() {
+async function testBasicImports() {
   console.log('\n📦 Testing basic imports...');
   try {
-    browserCore = require('../../dist/browser-core.js');
-    console.log('✅ Successfully imported browser-core bundle');
+    browserCore = await import('../../dist/browser-core.esm.js');
+    console.log('✅ Successfully imported browser-core ESM bundle');
     
     // Check available exports
     const exports = Object.keys(browserCore);
@@ -194,7 +196,7 @@ function testZeroConfigLoggers() {
   }
 }
 
-function runAllTests() {
+async function runAllTests() {
   console.log('🚀 Starting all tests...\n');
   
   const tests = [
@@ -210,7 +212,7 @@ function runAllTests() {
   
   for (const test of tests) {
     try {
-      const result = test.fn();
+      const result = await test.fn();
       if (result) {
         passed++;
         console.log(`✅ ${test.name} test passed`);
@@ -228,11 +230,11 @@ function runAllTests() {
   console.log(`❌ Failed: ${total - passed}/${total}`);
   
   if (passed === total) {
-    console.log('\n🎉 All tests passed! Browser-core bundle is working correctly.');
-    process.exit(0);
+    console.log('\n🎉 All tests passed! Browser-core ESM bundle is working correctly.');
+    return true;
   } else {
     console.log('\n💥 Some tests failed. Please check the errors above.');
-    process.exit(1);
+    return false;
   }
 }
 

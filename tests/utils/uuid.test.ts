@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { generateUUID, generateShortId, generateRequestId } from '../../utils/uuid';
+import { generateUUID, generateShortId, generateRequestId } from '../../src/utils/uuid';
 
 describe('UUID Utils', () => {
   describe('generateUUID', () => {

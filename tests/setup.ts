@@ -1,10 +1,10 @@
 // Test setup file
 import { vi, beforeEach, beforeAll, afterAll } from 'vitest';
-import { resetAllSingletons } from '../utils/singleton-manager';
+import '@testing-library/jest-dom';
 
-// Reset all singletons before each test
+// Reset logger before each test
 beforeEach(() => {
-  resetAllSingletons();
+  // Simple logger doesn't need reset
 });
 
 // Mock console methods to avoid noise in tests

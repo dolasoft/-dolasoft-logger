@@ -30,7 +30,8 @@ let logger;
 function testBasicImports() {
   console.log('\n📦 Testing basic imports...');
   try {
-    browserCore = require('../../dist/browser-core.js');
+    // Use ESM version for Node.js testing (UMD is for browsers only)
+    browserCore = require('../../dist/browser-core.esm.js');
     console.log('✅ Successfully imported browser-core bundle');
     
     // Check available exports
