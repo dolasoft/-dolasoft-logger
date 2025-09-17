@@ -100,6 +100,18 @@ yarn add @dolasoftfree/logger
 pnpm add @dolasoftfree/logger
 ```
 
+### 🌐 Browser vs Node.js
+
+For **browser environments** (React, Next.js client-side), use the browser entry point:
+```typescript
+import { getLogger } from '@dolasoftfree/logger/browser';
+```
+
+For **Node.js environments** (server-side, Express), use the main entry point:
+```typescript
+import { getLogger } from '@dolasoftfree/logger';
+```
+
 
 ## 📊 Comparison
 

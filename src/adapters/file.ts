@@ -1,6 +1,23 @@
 import { LogAdapter, LogEntry, LoggerConfig, LogLevel } from '../core/types';
-import * as fs from 'fs';
-import * as path from 'path';
+
+// Dynamic imports for Node.js modules to avoid browser bundling issues
+let fs: any;
+let path: any;
+
+const getNodeModules = () => {
+  if (typeof window !== 'undefined') {
+    throw new Error('FileAdapter can only be used in Node.js environment');
+  }
+  if (!fs || !path) {
+    try {
+      fs = require('fs');
+      path = require('path');
+    } catch (error) {
+      throw new Error('FileAdapter requires Node.js fs and path modules');
+    }
+  }
+  return { fs, path };
+};
 
 export interface FileAdapterConfig {
   filePath?: string;
@@ -52,6 +69,7 @@ export class FileAdapter implements LogAdapter {
   }
 
   private setupFilePath(): void {
+    const { path } = getNodeModules();
     if (this.fileConfig.filePath) {
       this.filePath = this.fileConfig.filePath;
     } else if (this.fileConfig.directory && this.fileConfig.fileName) {
@@ -62,6 +80,7 @@ export class FileAdapter implements LogAdapter {
   }
 
   private ensureDirectoryExists(): void {
+    const { fs, path } = getNodeModules();
     const dir = path.dirname(this.filePath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -99,6 +118,7 @@ export class FileAdapter implements LogAdapter {
   }
 
   private async writeToFile(entry: LogEntry): Promise<void> {
+    const { fs } = getNodeModules();
     const logLine = this.formatLogEntry(entry);
     
     // Check if file exists and handle overwrite/append modes
@@ -162,6 +182,7 @@ export class FileAdapter implements LogAdapter {
 
   private async rotateIfNeeded(): Promise<void> {
     try {
+      const { fs } = getNodeModules();
       const stats = fs.statSync(this.filePath);
       const maxFileSize = this.fileConfig.maxFileSize || 10 * 1024 * 1024; // 10MB
       
@@ -174,6 +195,7 @@ export class FileAdapter implements LogAdapter {
   }
 
   private async rotateFile(): Promise<void> {
+    const { fs } = getNodeModules();
     const maxFiles = this.fileConfig.maxFiles || 5;
     const basePath = this.filePath.replace('.log', '');
     

@@ -47,7 +47,7 @@ const getPlugins = (external = []) => {
 };
 
 module.exports = [
-  // Main build
+  // Main build (Node.js + Browser)
   {
     input: 'src/index.ts',
     output: [
@@ -65,6 +65,25 @@ module.exports = [
     ],
     plugins: getPlugins(),
     external: ['react', 'next', 'crypto']
+  },
+  // Browser build (excludes Node.js-only features)
+  {
+    input: 'src/browser.ts',
+    output: [
+      {
+        file: 'dist/browser.js',
+        format: 'cjs',
+        sourcemap: true,
+        exports: 'named'
+      },
+      {
+        file: 'dist/browser.esm.js',
+        format: 'esm',
+        sourcemap: true
+      }
+    ],
+    plugins: getPlugins(),
+    external: ['react', 'next', 'crypto', 'fs', 'path']
   },
   // React integration
   {
@@ -146,6 +165,12 @@ module.exports = [
   {
     input: 'dist/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'esm' }],
+    plugins: [dts()],
+    external: [/\.css$/]
+  },
+  {
+    input: 'dist/browser.d.ts',
+    output: [{ file: 'dist/browser.d.ts', format: 'esm' }],
     plugins: [dts()],
     external: [/\.css$/]
   },
