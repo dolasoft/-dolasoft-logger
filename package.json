@@ -15,7 +15,7 @@
     "API_REFERENCE.md",
     "EXAMPLES.md",
     "CONTRIBUTING.md",
-    "CHANGELOG.md",
+    "TESTING.md",
     "LICENSE"
   ],
   "exports": {

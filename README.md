@@ -5,32 +5,39 @@
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/dolasoft/-dolasoft-logger/ci.yml)
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/@dolasoftfree/logger?label=bundle%20size&color=green)](https://bundlephobia.com/package/@dolasoftfree/logger@1.0.2)
-[![Performance](https://img.shields.io/badge/performance-🚀%20ultra%20lightweight-brightgreen)](https://bundlephobia.com/package/@dolasoftfree/logger@1.0.2)
 
 **Enterprise-grade logging library with zero-configuration setup for React, Next.js, and Node.js applications.**
 
-## 🚀 Performance Highlights
+## 📑 Table of Contents
+
+- [🚀 Key Features](#-key-features)
+- [🚀 Quick Start](#-quick-start)
+- [📦 Installation](#-installation)
+- [📊 Comparison](#-comparison)
+- [🔧 Framework Integration](#-framework-integration)
+- [📊 Environment Comparison](#-environment-comparison)
+- [🎯 Zero Config Adapters](#-zero-config-adapters)
+- [🎨 Available Methods](#-available-methods)
+- [🔧 Configuration Options](#-configuration-options)
+- [🌍 Environment Behavior](#-environment-behavior)
+- [📚 API Reference](#-api-reference)
+- [🎯 Log Levels](#-log-levels)
+- [🔄 Log Strategies](#-log-strategies)
+- [🚀 Examples](#-examples)
+- [📖 Documentation](#-documentation)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [🆘 Support](#-support)
+
+## 🚀 Key Features
 
 - **Ultra Lightweight**: Only **1.1KB gzipped** - smaller than most utility libraries!
-- **Zero Dependencies**: No external dependencies to bloat your bundle
-- **Tree Shakeable**: Only import what you need
+- **Zero Configuration**: Works out of the box with smart defaults
+- **Production Ready**: No console logging in production, prevents memory overflow
+- **Multiple Adapters**: Console, Memory, File, Remote with zero-config setup
+- **Framework Integrations**: React, Next.js, Express, Vanilla JS
 - **TypeScript First**: Full type safety with zero runtime overhead
-- **Production Ready**: Optimized for performance in production environments
-
-[![Bundle Size](https://img.shields.io/bundlephobia/minzip/@dolasoftfree/logger?label=minified%20%2B%20gzipped&color=green)](https://bundlephobia.com/package/@dolasoftfree/logger@1.0.2)
-
-## ✨ Features
-
-- 🚀 **Zero Configuration**: Works out of the box with smart defaults
-- 🎯 **Production Ready**: No console logging in production, prevents memory overflow
-- 🔌 **Multiple Adapters**: Console, Memory, Database, File, Remote
-- ⚡ **Framework Integrations**: React, Next.js, Express
-- 📊 **Structured Logging**: JSON and text formats with context enrichment
-- 🔄 **Log Rotation**: Automatic file rotation with size limits
-- 📈 **Performance**: Async logging with batching
-- 🛡️ **TypeScript**: Full type safety and IntelliSense
-- 📦 **Zero Dependencies**: Lightweight and fast
-- 🌐 **Universal**: Works in any JavaScript/TypeScript environment
+- **Zero Dependencies**: No external dependencies to bloat your bundle
 
 ## 🚀 Quick Start
 
@@ -93,36 +100,6 @@ yarn add @dolasoftfree/logger
 pnpm add @dolasoftfree/logger
 ```
 
-## 🎯 Two Approaches
-
-### 1. Zero Config (90% of use cases)
-
-**Perfect for most applications - no configuration needed:**
-
-```tsx
-import { ZeroConfigLoggerProvider, useZeroConfigLogger } from '@dolasoftfree/logger';
-
-<ZeroConfigLoggerProvider>
-  <App />
-</ZeroConfigLoggerProvider>
-```
-
-### 2. Simple Config (When you need control)
-
-**For when you need specific customization:**
-
-```tsx
-import { SimpleLoggerProvider, useSimpleLogger } from '@dolasoftfree/logger';
-
-<SimpleLoggerProvider 
-  appSlug="my-custom-app"
-  userId="user-123"
-  remoteEndpoint="/api/custom-logs"
-  maxMemoryEntries={100}
->
-  <App />
-</SimpleLoggerProvider>
-```
 
 ## 📊 Comparison
 
@@ -136,11 +113,9 @@ import { SimpleLoggerProvider, useSimpleLogger } from '@dolasoftfree/logger';
 | **Memory Limit** | 50 entries | Customizable |
 | **Use Case** | 90% of apps | When you need control |
 
-## 🔧 Easy Setup for All Environments
+## 🔧 Framework Integration
 
-### 🚀 Zero Config Setup (All Environments)
-
-#### React (Client-side)
+### React/Next.js
 ```tsx
 import { ZeroConfigLoggerProvider, useZeroConfigLogger } from '@dolasoftfree/logger';
 
@@ -151,136 +126,23 @@ function App() {
     </ZeroConfigLoggerProvider>
   );
 }
-
-function MyComponent() {
-  const { logger, logUserAction, logError } = useZeroConfigLogger();
-  
-  const handleClick = () => {
-    logger.info('Button clicked');
-    logUserAction('button_click', { buttonId: 'cta' });
-  };
-
-  return <button onClick={handleClick}>Click me</button>;
-}
 ```
 
-#### Next.js (Full-stack)
-```tsx
-// app/layout.tsx - Client-side provider
-import { ZeroConfigLoggerProvider } from '@dolasoftfree/logger';
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html>
-      <body>
-        <ZeroConfigLoggerProvider>
-          {children}
-        </ZeroConfigLoggerProvider>
-      </body>
-    </html>
-  );
-}
-
-// app/api/users/route.ts - Server-side
-import { getServerLogger } from '@dolasoftfree/logger/nextjs';
-
-export async function GET(request: NextRequest) {
-  const logger = getServerLogger(request);
-  
-  logger.info('API called');
-  
-  try {
-    return Response.json({ users: [] });
-  } catch (error) {
-    logger.error('API error', error);
-    return Response.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
-```
-
-#### Node.js (Server-side)
+### Node.js/Express
 ```typescript
 import { getLogger } from '@dolasoftfree/logger';
+import { createLoggingMiddleware } from '@dolasoftfree/logger/express';
 
 const logger = getLogger();
-
-logger.info('Server started');
-logger.error('Database error', error, { query: 'SELECT * FROM users' });
-```
-
-#### Express (Server-side)
-```typescript
-import express from 'express';
-import { createLoggingMiddleware, createErrorHandler } from '@dolasoftfree/logger/express';
-
-const app = express();
-
-// Zero config middleware - just add it!
 app.use(createLoggingMiddleware());
-app.use(createErrorHandler());
-
-app.get('/api/users', (req, res) => {
-  res.json({ users: [] });
-});
 ```
 
-#### Vanilla JavaScript (Browser)
+### Vanilla JavaScript
 ```html
-<!DOCTYPE html>
-<html>
-<head>
-  <script type="module">
-    import { getLogger } from 'https://unpkg.com/@dolasoftfree/logger/dist/index.esm.js';
-    
-    const logger = getLogger();
-    logger.info('Page loaded');
-    
-    document.getElementById('button').addEventListener('click', () => {
-      logger.info('Button clicked');
-    });
-  </script>
-</head>
-<body>
-  <button id="button">Click me</button>
-</body>
-</html>
-```
-
-### ⚙️ Simple Config Setup (When You Need Control)
-
-#### React with Custom Config
-```tsx
-import { SimpleLoggerProvider, useSimpleLogger } from '@dolasoftfree/logger';
-
-function App() {
-  return (
-    <SimpleLoggerProvider 
-      appSlug="my-custom-app"
-      userId="user-123"
-      remoteEndpoint="/api/custom-logs"
-      maxMemoryEntries={100}
-    >
-      <MyComponent />
-    </SimpleLoggerProvider>
-  );
-}
-```
-
-#### Node.js with Custom Config
-```typescript
-import { LoggerService, LogLevel, LogStrategy } from '@dolasoftfree/logger';
-
-const logger = new LoggerService({
-  strategy: LogStrategy.HYBRID,
-  level: LogLevel.INFO,
-  enableConsole: true,
-  enableFile: true,
-  filePath: './logs/app.log',
-  maxFileSize: 10 * 1024 * 1024, // 10MB
-  maxFiles: 5
-});
-
-logger.info('Custom configured server started');
+<script type="module">
+  import { getLogger } from '@dolasoftfree/logger';
+  const logger = getLogger();
+</script>
 ```
 
 ## 📊 Environment Comparison
@@ -606,134 +468,12 @@ logPerformance('database_query', 150, {
 - ✅ **Console Logging**: All logs printed to console
 - ✅ **Memory Logging**: 50 entries max for debugging
 - ✅ **Log Level**: DEBUG (shows all logs)
-- ✅ **Strategy**: CONSOLE
 
 ### Production
 - ❌ **Console Logging**: Disabled (no console pollution)
 - ❌ **Memory Logging**: Disabled (prevents memory overflow)
 - ✅ **Remote Logging**: Sends to `/api/logs` endpoint
 - ✅ **Log Level**: WARN (only warnings and errors)
-- ✅ **Strategy**: REMOTE
-
-## 📊 Logging Flow Table
-
-| Scenario | Environment | Log Level | Console | Memory | Remote | Strategy | Example |
-|----------|-------------|-----------|---------|--------|--------|----------|---------|
-| **Client Error** | Development | DEBUG | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.error('API failed', error)` → Console + Memory |
-| **Client Error** | Production | WARN | ❌ No | ❌ No | ✅ Yes | REMOTE | `logger.error('API failed', error)` → `/api/logs` endpoint |
-| **Client Info** | Development | DEBUG | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.info('Button clicked')` → Console + Memory |
-| **Client Info** | Production | WARN | ❌ No | ❌ No | ❌ No | REMOTE | `logger.info('Button clicked')` → Filtered out (below WARN) |
-| **Client Debug** | Development | DEBUG | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.debug('Debug info')` → Console + Memory |
-| **Client Debug** | Production | WARN | ❌ No | ❌ No | ❌ No | REMOTE | `logger.debug('Debug info')` → Filtered out (below WARN) |
-| **Client Warn** | Development | DEBUG | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.warn('Deprecated API')` → Console + Memory |
-| **Client Warn** | Production | WARN | ❌ No | ❌ No | ✅ Yes | REMOTE | `logger.warn('Deprecated API')` → `/api/logs` endpoint |
-| **Client Fatal** | Development | DEBUG | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.fatal('App crash', error)` → Console + Memory |
-| **Client Fatal** | Production | WARN | ❌ No | ❌ No | ✅ Yes | REMOTE | `logger.fatal('App crash', error)` → `/api/logs` endpoint |
-| **Server Error** | Development | DEBUG | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.error('DB error', error)` → Console + Memory |
-| **Server Error** | Production | WARN | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.error('DB error', error)` → Console + Memory |
-| **Server Info** | Development | DEBUG | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.info('Server started')` → Console + Memory |
-| **Server Info** | Production | WARN | ✅ Yes | ✅ Yes (50 max) | ❌ No | CONSOLE | `logger.info('Server started')` → Filtered out (below WARN) |
-
-### 🔄 Flow Examples
-
-#### Development Client Error Flow
-```
-User clicks button → logger.error('API failed', error) 
-    ↓
-1. Console: [2023-01-01T00:00:00.000Z] ERROR API failed {"error": "Connection failed"}
-2. Memory: Stored in memory (up to 50 entries)
-3. Remote: Not sent (disabled in development)
-```
-
-#### Production Client Error Flow
-```
-User clicks button → logger.error('API failed', error)
-    ↓
-1. Console: Nothing (disabled in production)
-2. Memory: Nothing (disabled in production)
-3. Remote: POST /api/logs with error data
-```
-
-#### Development Client Info Flow
-```
-User clicks button → logger.info('Button clicked')
-    ↓
-1. Console: [2023-01-01T00:00:00.000Z] INFO Button clicked
-2. Memory: Stored in memory (up to 50 entries)
-3. Remote: Not sent (disabled in development)
-```
-
-#### Production Client Info Flow
-```
-User clicks button → logger.info('Button clicked')
-    ↓
-1. Console: Nothing (disabled in production)
-2. Memory: Nothing (disabled in production)
-3. Remote: Nothing (INFO level filtered out in production)
-```
-
-### 🎯 Key Points
-
-- **Client-side**: Behavior changes based on environment (dev vs prod)
-- **Server-side**: Always uses console + memory (no remote logging)
-- **Memory Safety**: Client-side memory limited to 50 entries in dev, 0 in prod
-- **Console Safety**: Client-side console disabled in production
-- **Level Filtering**: Production only shows WARN and ERROR levels
-- **Remote Logging**: Only enabled for client-side in production
-
-### 🔄 Visual Flow Diagram
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           LOGGING FLOW DIAGRAM                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────┐    ┌─────────────────┐
-│   CLIENT SIDE   │    │   SERVER SIDE   │
-└─────────────────┘    └─────────────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐
-│  logger.error() │    │  logger.error() │
-│  logger.info()  │    │  logger.info()  │
-│  logger.warn()  │    │  logger.warn()  │
-└─────────────────┘    └─────────────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐
-│   ENVIRONMENT   │    │   ENVIRONMENT   │
-│   DETECTION     │    │   DETECTION     │
-└─────────────────┘    └─────────────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐
-│  DEVELOPMENT    │    │  DEVELOPMENT    │
-│  PRODUCTION     │    │  PRODUCTION     │
-└─────────────────┘    └─────────────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐
-│  CONSOLE +      │    │  CONSOLE +      │
-│  MEMORY         │    │  MEMORY         │
-│  (50 entries)   │    │  (50 entries)   │
-└─────────────────┘    └─────────────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐
-│  ✅ Console     │    │  ✅ Console     │
-│  ✅ Memory      │    │  ✅ Memory      │
-│  ❌ Remote      │    │  ❌ Remote      │
-└─────────────────┘    └─────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              SUMMARY                                       │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ • CLIENT DEV:  Console + Memory (50 entries)                              │
-│ • CLIENT PROD: Remote API only (no console, no memory)                    │
-│ • SERVER:      Console + Memory (both dev and prod)                       │
-│ • LEVELS:      DEV=DEBUG, PROD=WARN (filters out INFO/DEBUG in prod)      │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
 
 ## 📚 API Reference
 
@@ -906,40 +646,16 @@ export default function HomePage() {
 }
 ```
 
-## 📖 Examples
+## 📖 Documentation
 
-For comprehensive usage examples across different frameworks and environments, see [EXAMPLES.md](EXAMPLES.md).
-
-### Quick Examples
-
-**Zero Config (Recommended):**
-```tsx
-import { SmartProvider, useZeroConfigLogger } from '@dolasoftfree/logger';
-
-function App() {
-  return (
-    <SmartProvider>
-      <MyComponent />
-    </SmartProvider>
-  );
-}
-```
-
-**Direct Usage:**
-```typescript
-import { getLogger } from '@dolasoftfree/logger';
-
-const logger = getLogger();
-logger.info('Hello World');
-```
+- **[API Reference](API_REFERENCE.md)** - Complete API documentation
+- **[Examples](EXAMPLES.md)** - Comprehensive usage examples across different frameworks
+- **[Testing Guide](TESTING.md)** - How to test your logging implementation
+- **[Contributing](CONTRIBUTING.md)** - Guidelines for contributing to the project
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.
 
 ## 📄 License
 
@@ -949,10 +665,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 🐛 Issues: [GitHub Issues](https://github.com/dolasoft/-dolasoft-logger/issues)
 - 📖 Documentation: [GitHub Wiki](https://github.com/dolasoft/-dolasoft-logger/wiki)
-
-## 📝 Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.
 
 ---
 
