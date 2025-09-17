@@ -1,11 +1,11 @@
 {
   "name": "@dolasoftfree/logger",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
-  "description": "Enterprise-grade logging library with multiple adapters and framework integrations",
+  "description": "Simple, universal logging library for React, Next.js, and Node.js applications",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
