@@ -53,7 +53,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx --fix",
     "prepublishOnly": "npm run build:prod && npm run test:run",
-    "version": "npm run build:prod && git add -A dist",
+    "version": "npm run build:prod",
     "postversion": "git push && git push --tags",
     "release": "node scripts/release.js",
     "release:patch": "node scripts/release.js patch",
