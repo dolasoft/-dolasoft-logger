@@ -27,9 +27,9 @@ Enterprise-grade logging library with multiple adapters and framework integratio
 ```bash
 npm install @dolasoftfree/logger
 # or
-yarn add @dolasoft/logger
+yarn add @dolasoftfree/logger
 # or
-pnpm add @dolasoft/logger
+pnpm add @dolasoftfree/logger
 ```
 
 ## Quick Start
@@ -39,7 +39,7 @@ pnpm add @dolasoft/logger
 The logger works in **any JavaScript/TypeScript environment**:
 
 ```typescript
-import { getLogger } from '@dolasoft/logger';
+import { getLogger } from '@dolasoftfree/logger';
 
 const logger = getLogger();
 
@@ -50,7 +50,7 @@ logger.error('Something went wrong', new Error('Database connection failed'));
 ### Node.js
 
 ```javascript
-const { getLogger, LogLevel, LogStrategy } = require('@dolasoft/logger');
+const { getLogger, LogLevel, LogStrategy } = require('@dolasoftfree/logger');
 
 const logger = getLogger({
   strategy: LogStrategy.HYBRID,
@@ -67,7 +67,7 @@ logger.info('Node.js application started');
 
 ```html
 <script type="module">
-  import { getLogger } from '@dolasoft/logger';
+  import { getLogger } from '@dolasoftfree/logger';
   
   const logger = getLogger({
     strategy: 'console',
@@ -86,7 +86,7 @@ import {
   LogLevel, 
   LogStrategy, 
   LoggerService 
-} from '@dolasoft/logger';
+} from '@dolasoftfree/logger';
 
 const logger = getLogger({
   strategy: LogStrategy.CONSOLE,
@@ -137,7 +137,7 @@ The logger works in **any JavaScript/TypeScript environment**:
 ### React Integration
 
 ```typescript
-import { useLogger } from '@dolasoft/logger/react';
+import { useLogger } from '@dolasoftfree/logger/react';
 
 function MyComponent() {
   const logger = useLogger({ appSlug: 'my-app', userId: 'user-123' });
@@ -153,7 +153,7 @@ function MyComponent() {
 ### Next.js API Routes (Server-side)
 
 ```typescript
-import { getServerLogger } from '@dolasoft/logger/nextjs';
+import { getServerLogger } from '@dolasoftfree/logger/nextjs';
 
 export async function GET(request: NextRequest) {
   const logger = getServerLogger(request);
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
 ### Next.js Client Components
 
 ```typescript
-import { useNextJSClientLogger } from '@dolasoft/logger/nextjs-client';
+import { useNextJSClientLogger } from '@dolasoftfree/logger/nextjs-client';
 
 function MyClientComponent() {
   const logger = useNextJSClientLogger({ 
@@ -201,7 +201,7 @@ function MyClientComponent() {
 
 ```typescript
 import express from 'express';
-import { createLoggingMiddleware, createErrorHandler } from '@dolasoft/logger/express';
+import { createLoggingMiddleware, createErrorHandler } from '@dolasoftfree/logger/express';
 
 const app = express();
 
@@ -244,7 +244,7 @@ NODE_ENV=production
 ### Programmatic Configuration
 
 ```typescript
-import { LoggerService, LogLevel, LogStrategy } from '@dolasoft/logger';
+import { LoggerService, LogLevel, LogStrategy } from '@dolasoftfree/logger';
 
 const logger = new LoggerService({
   strategy: LogStrategy.HYBRID,
@@ -409,7 +409,7 @@ app.use(createErrorHandler());
 ### Custom Logger Configuration
 
 ```typescript
-import { LoggerService, LogLevel, LogStrategy } from '@dolasoft/logger';
+import { LoggerService, LogLevel, LogStrategy } from '@dolasoftfree/logger';
 
 const logger = new LoggerService({
   strategy: LogStrategy.HYBRID,
@@ -432,7 +432,7 @@ const logger = new LoggerService({
 The logger supports advanced file logging with rotation, size limits, and flexible configuration:
 
 ```typescript
-import { LoggerService, LogLevel, LogStrategy } from '@dolasoft/logger';
+import { LoggerService, LogLevel, LogStrategy } from '@dolasoftfree/logger';
 
 // Error-only file logging with rotation
 const errorLogger = LoggerService.create({
@@ -485,7 +485,7 @@ const dailyLogger = LoggerService.create({
 ### Database Integration
 
 ```typescript
-import { DatabaseAdapter } from '@dolasoft/logger';
+import { DatabaseAdapter } from '@dolasoftfree/logger';
 
 // Custom database adapter
 class CustomDatabaseAdapter extends DatabaseAdapter {
@@ -499,7 +499,7 @@ class CustomDatabaseAdapter extends DatabaseAdapter {
 ### Error Tracking
 
 ```typescript
-import { getLogger } from '@dolasoft/logger';
+import { getLogger } from '@dolasoftfree/logger';
 
 const logger = getLogger();
 

@@ -1,9 +1,9 @@
-# @dolasoft/logger - AI API Reference
+# @dolasoftfree/logger - AI API Reference
 
 ## Quick Start
 
 ```typescript
-import { getLogger, LogLevel, LogStrategy } from '@dolasoft/logger';
+import { getLogger, LogLevel, LogStrategy } from '@dolasoftfree/logger';
 
 const logger = getLogger();
 logger.info('Hello World');
@@ -16,7 +16,7 @@ logger.info('Hello World');
 **Main logger class with singleton pattern**
 
 ```typescript
-import { LoggerService, LogLevel, LogStrategy } from '@dolasoft/logger';
+import { LoggerService, LogLevel, LogStrategy } from '@dolasoftfree/logger';
 
 // Get singleton instance
 const logger = LoggerService.getInstance();
@@ -96,7 +96,7 @@ enum LogStrategy {
 ### React
 
 ```typescript
-import { useLogger } from '@dolasoft/logger/react';
+import { useLogger } from '@dolasoftfree/logger/react';
 
 function MyComponent() {
   const logger = useLogger({ 
@@ -111,7 +111,7 @@ function MyComponent() {
 ### Next.js (Server)
 
 ```typescript
-import { getServerLogger } from '@dolasoft/logger/nextjs';
+import { getServerLogger } from '@dolasoftfree/logger/nextjs';
 
 export async function GET(request: NextRequest) {
   const logger = getServerLogger(request);
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
 ### Next.js (Client)
 
 ```typescript
-import { useNextJSClientLogger } from '@dolasoft/logger/nextjs-client';
+import { useNextJSClientLogger } from '@dolasoftfree/logger/nextjs-client';
 
 function MyComponent() {
   const logger = useNextJSClientLogger({ 
@@ -137,7 +137,7 @@ function MyComponent() {
 ### Express
 
 ```typescript
-import { createLoggingMiddleware, createErrorHandler } from '@dolasoft/logger/express';
+import { createLoggingMiddleware, createErrorHandler } from '@dolasoftfree/logger/express';
 
 app.use(createLoggingMiddleware());
 app.use(createErrorHandler());
@@ -190,7 +190,7 @@ const dailyLogger = LoggerService.create({
 ### Convenience Functions
 
 ```typescript
-import { logInfo, logError, logWarn, logDebug, logFatal } from '@dolasoft/logger';
+import { logInfo, logError, logWarn, logDebug, logFatal } from '@dolasoftfree/logger';
 
 logInfo('Quick info message');
 logError('Quick error', new Error('Test error'));
@@ -199,7 +199,7 @@ logError('Quick error', new Error('Test error'));
 ### UUID Generation
 
 ```typescript
-import { generateUUID, generateShortId, generateRequestId } from '@dolasoft/logger';
+import { generateUUID, generateShortId, generateRequestId } from '@dolasoftfree/logger';
 
 const uuid = generateUUID();
 const shortId = generateShortId();
@@ -209,7 +209,7 @@ const requestId = generateRequestId('req');
 ### Singleton Management
 
 ```typescript
-import { resetAllSingletons, areSingletonsInitialized } from '@dolasoft/logger';
+import { resetAllSingletons, areSingletonsInitialized } from '@dolasoftfree/logger';
 
 // Reset all singletons (useful for testing)
 resetAllSingletons();
@@ -330,11 +330,11 @@ logger.info('User action', {
 ## Installation
 
 ```bash
-npm install @dolasoft/logger
+npm install @dolasoftfree/logger
 # or
-yarn add @dolasoft/logger
+yarn add @dolasoftfree/logger
 # or
-pnpm add @dolasoft/logger
+pnpm add @dolasoftfree/logger
 ```
 
 ## TypeScript Support
