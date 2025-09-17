@@ -29,26 +29,6 @@
       "import": "./dist/browser.esm.js",
       "require": "./dist/browser.js"
     },
-    "./react": {
-      "types": "./dist/integrations/react.d.ts",
-      "import": "./dist/integrations/react.esm.js",
-      "require": "./dist/integrations/react.js"
-    },
-    "./nextjs": {
-      "types": "./dist/integrations/nextjs.d.ts",
-      "import": "./dist/integrations/nextjs.esm.js",
-      "require": "./dist/integrations/nextjs.js"
-    },
-    "./nextjs-client": {
-      "types": "./dist/integrations/nextjs-client.d.ts",
-      "import": "./dist/integrations/nextjs-client.esm.js",
-      "require": "./dist/integrations/nextjs-client.js"
-    },
-    "./express": {
-      "types": "./dist/integrations/express.d.ts",
-      "import": "./dist/integrations/express.esm.js",
-      "require": "./dist/integrations/express.js"
-    }
   },
   "scripts": {
     "build": "rollup -c",
