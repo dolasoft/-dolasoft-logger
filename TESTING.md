@@ -4,6 +4,54 @@
 
 We use **Vitest** - a fast, modern testing framework that's much faster than Jest.
 
+## 🌐 Browser Testing
+
+### Interactive Browser Tests
+
+We provide comprehensive browser testing tools to verify the logger works correctly in real browser environments.
+
+#### Interactive Test Page
+```bash
+# Open the test page in your browser
+open tests/browser/test-browser.html
+```
+
+This page provides:
+- ✅ Bundle loading verification
+- ✅ Export availability testing
+- ✅ Logger creation testing
+- ✅ Logging functionality testing
+- ✅ UUID generation testing
+- ✅ Zero-config logger testing
+- ✅ Interactive UI with real-time results
+- ✅ Individual test buttons
+- ✅ Detailed test results
+- ✅ Error reporting
+
+### Automated Browser Tests
+
+```bash
+# Run automated browser tests
+npm run test:browser
+```
+
+This command:
+- ✅ Verifies build files exist
+- ✅ Runs Node.js compatibility tests
+- ✅ Provides browser testing instructions
+- ✅ Exits with proper status codes for CI/CD
+
+### Test Files Structure
+
+```
+tests/
+├── README.md                           # Test documentation
+├── run-browser-tests.cjs              # Test runner script
+└── browser/
+    ├── test-browser.html              # Interactive test suite
+    └── test-browser-core.cjs          # Node.js test script
+```
+
 ### Installation
 
 ```bash

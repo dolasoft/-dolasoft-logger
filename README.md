@@ -38,6 +38,8 @@
 - **Framework Integrations**: React, Next.js, Express, Vanilla JS
 - **TypeScript First**: Full type safety with zero runtime overhead
 - **Zero Dependencies**: No external dependencies to bloat your bundle
+- **Universal Compatibility**: Separate bundles for Node.js and browser environments
+- **Browser Optimized**: UMD format with no Node.js dependencies in browser bundle
 
 ## 🚀 Quick Start
 
@@ -155,6 +157,42 @@ app.use(createLoggingMiddleware());
   import { getLogger } from '@dolasoftfree/logger';
   const logger = getLogger();
 </script>
+```
+
+## 🌐 Browser vs Node.js
+
+### Node.js Usage
+```javascript
+// Node.js - Full functionality including file logging
+const { getLogger, LogLevel } = require('@dolasoftfree/logger');
+
+const logger = getLogger({
+  level: LogLevel.DEBUG,
+  enableFile: true, // File logging available in Node.js
+  filePath: './logs/app.log'
+});
+```
+
+### Browser Usage
+```javascript
+// Browser - UMD format (no file logging)
+<script src="https://unpkg.com/@dolasoftfree/logger/dist/browser-core.js"></script>
+<script>
+  const logger = window.DolaSoftLoggerCore.getLogger({
+    level: window.DolaSoftLoggerCore.LogLevel.DEBUG
+    // File logging not available in browser
+  });
+</script>
+```
+
+### ES Modules (Browser)
+```javascript
+// Browser - ES modules
+import { getLogger, LogLevel } from '@dolasoftfree/logger/browser-core';
+
+const logger = getLogger({
+  level: LogLevel.DEBUG
+});
 ```
 
 ## 📊 Environment Comparison

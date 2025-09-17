@@ -2,6 +2,84 @@
 
 This document contains comprehensive examples of how to use `@dolasoftfree/logger` in different environments and frameworks.
 
+## 🌐 Browser Examples
+
+### UMD Script Tag (Vanilla JavaScript)
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Logger Example</title>
+  <script src="https://unpkg.com/@dolasoftfree/logger/dist/browser-core.js"></script>
+</head>
+<body>
+  <button id="logBtn">Log Message</button>
+  <script>
+    // Use the global DolaSoftLoggerCore
+    const logger = window.DolaSoftLoggerCore.getLogger({
+      level: window.DolaSoftLoggerCore.LogLevel.DEBUG
+    });
+
+    document.getElementById('logBtn').addEventListener('click', () => {
+      logger.info('Button clicked!', { timestamp: Date.now() });
+      logger.error('Test error', new Error('Something went wrong'));
+    });
+  </script>
+</body>
+</html>
+```
+
+### ES Modules (Modern Browser)
+```javascript
+// main.js
+import { getLogger, LogLevel, LogStrategy } from '@dolasoftfree/logger/browser-core';
+
+const logger = getLogger({
+  level: LogLevel.DEBUG,
+  strategy: LogStrategy.CONSOLE
+});
+
+// Log some messages
+logger.debug('Debug message');
+logger.info('Info message');
+logger.warn('Warning message');
+logger.error('Error message', new Error('Test error'));
+
+// Use convenience functions
+import { logDebug, logInfo, logWarn, logError } from '@dolasoftfree/logger/browser-core';
+
+logDebug('Quick debug message');
+logInfo('Quick info message');
+logWarn('Quick warning message');
+logError('Quick error message', new Error('Test error'));
+```
+
+### React with Browser Bundle
+```tsx
+// App.tsx
+import React from 'react';
+import { getLogger, LogLevel } from '@dolasoftfree/logger/browser-core';
+
+const logger = getLogger({
+  level: LogLevel.DEBUG
+});
+
+function App() {
+  const handleClick = () => {
+    logger.info('Button clicked in React app');
+  };
+
+  return (
+    <div>
+      <h1>My App</h1>
+      <button onClick={handleClick}>Click me</button>
+    </div>
+  );
+}
+
+export default App;
+```
+
 ## 🚀 Quick Start Examples
 
 ### Zero Config (Recommended)

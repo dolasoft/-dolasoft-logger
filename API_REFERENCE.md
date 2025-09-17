@@ -1,5 +1,52 @@
 # @dolasoftfree/logger - API Reference
 
+## 🌐 Browser vs Node.js
+
+### Node.js Usage
+```javascript
+// Node.js - Full functionality including file logging
+const { getLogger, LogLevel, LogStrategy } = require('@dolasoftfree/logger');
+
+const logger = getLogger({
+  level: LogLevel.DEBUG,
+  strategy: LogStrategy.HYBRID,
+  enableFile: true, // File logging available in Node.js
+  filePath: './logs/app.log'
+});
+```
+
+### Browser Usage (UMD)
+```html
+<!-- Browser - UMD format (no file logging) -->
+<script src="https://unpkg.com/@dolasoftfree/logger/dist/browser-core.js"></script>
+<script>
+  const logger = window.DolaSoftLoggerCore.getLogger({
+    level: window.DolaSoftLoggerCore.LogLevel.DEBUG,
+    strategy: window.DolaSoftLoggerCore.LogStrategy.CONSOLE
+    // File logging not available in browser
+  });
+</script>
+```
+
+### Browser Usage (ES Modules)
+```javascript
+// Browser - ES modules
+import { getLogger, LogLevel, LogStrategy } from '@dolasoftfree/logger/browser-core';
+
+const logger = getLogger({
+  level: LogLevel.DEBUG,
+  strategy: LogStrategy.CONSOLE
+});
+```
+
+### Available Entry Points
+
+| Entry Point | Environment | Format | File Logging | React Support |
+|-------------|-------------|--------|--------------|---------------|
+| `@dolasoftfree/logger` | Node.js | CommonJS/ESM | ✅ Yes | ❌ No |
+| `@dolasoftfree/logger/browser` | Browser | UMD/ESM | ❌ No | ✅ Yes |
+| `@dolasoftfree/logger/browser-core` | Browser | UMD/ESM | ❌ No | ❌ No |
+
 ## 🚀 Quick Start
 
 ### Zero Configuration (Recommended)
