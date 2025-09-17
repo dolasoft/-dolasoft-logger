@@ -21,6 +21,7 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
         
     - name: Install dependencies
       run: npm ci
@@ -29,8 +30,13 @@ jobs:
       run: npm run test:run
       
     - name: Build package
-      run: npm run build
+      run: npm run build:prod
       
+    - name: Publish to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
     - name: Generate changelog
       id: changelog
       run: |
@@ -53,7 +59,7 @@ jobs:
         echo "" >> CHANGELOG.md
         echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$LAST_TAG...$VERSION" >> CHANGELOG.md
         
-    - name: Create Release
+    - name: Create GitHub Release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

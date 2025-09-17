@@ -1,5 +1,5 @@
 {
-  "name": "@dolasoft/logger",
+  "name": "@dolasoftfree/logger",
   "version": "1.0.0",
   "description": "Enterprise-grade logging library with multiple adapters and framework integrations",
   "main": "dist/index.js",
@@ -8,6 +8,8 @@
   "files": [
     "dist",
     "README.md",
+    "API_REFERENCE.md",
+    "CONTRIBUTING.md",
     "CHANGELOG.md",
     "LICENSE"
   ],
@@ -49,7 +51,12 @@
     "test:run": "vitest run",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build:prod && npm run test:run",
-    "release": "npm run build:prod && npm publish"
+    "version": "npm run build:prod && git add -A dist",
+    "postversion": "git push && git push --tags",
+    "release": "node scripts/release.js",
+    "release:patch": "node scripts/release.js patch",
+    "release:minor": "node scripts/release.js minor",
+    "release:major": "node scripts/release.js major"
   },
   "keywords": [
     "logger",
