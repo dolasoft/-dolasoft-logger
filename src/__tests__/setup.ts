@@ -52,11 +52,5 @@ interface MockRequire {
   }
 ) as MockRequire;
 
-// Mock crypto for UUID generation
-Object.defineProperty(globalThis, 'crypto', {
-  value: {
-    randomUUID: vi.fn(() => 'mocked-browser-uuid-123'),
-  },
-  writable: true,
-  configurable: true
-});
+// Mock crypto for UUID generation - only when needed
+// We'll let the actual crypto.randomUUID work in tests unless specifically mocked

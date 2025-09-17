@@ -120,14 +120,14 @@ export class SingletonManager {
    * Useful for testing to ensure clean state
    */
   static resetAll(): void {
-    this.getActiveLoggers().forEach(service => service.reset());
+    SingletonManager.getActiveLoggers().forEach(service => service.reset());
   }
 
   /**
    * Reset a specific logger singleton (only if it's active)
    */
   static resetLogger(name: string): void {
-    const activeLoggers = this.getActiveLoggers();
+    const activeLoggers = SingletonManager.getActiveLoggers();
     const service = activeLoggers.get(name);
     if (service) {
       service.reset();
@@ -139,7 +139,7 @@ export class SingletonManager {
    */
   static getState(): Record<string, unknown> {
     const state: Record<string, unknown> = {};
-    this.getActiveLoggers().forEach((service, name) => {
+    SingletonManager.getActiveLoggers().forEach((service, name) => {
       try {
         state[name] = service.getInstance();
       } catch {
@@ -154,7 +154,7 @@ export class SingletonManager {
    */
   static isInitialized(): boolean {
     try {
-      this.getActiveLoggers().forEach(service => service.getInstance());
+      SingletonManager.getActiveLoggers().forEach(service => service.getInstance());
       return true;
     } catch {
       return false;
@@ -166,7 +166,7 @@ export class SingletonManager {
    */
   static isLoggerInitialized(name: string): boolean {
     try {
-      const activeLoggers = this.getActiveLoggers();
+      const activeLoggers = SingletonManager.getActiveLoggers();
       const service = activeLoggers.get(name);
       if (service) {
         service.getInstance();
