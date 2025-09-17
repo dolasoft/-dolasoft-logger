@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { LoggerService, LogLevel } from '../core';
 import { LogStrategy } from '../core/types';
 import type { LogMethod, ErrorLogMethod } from '../core/types';
-import { generateRequestId } from '../utils/uuid';
+import { generateRequestId as _generateRequestId } from '../utils/uuid';
 import { isDevelopment, isProduction } from '../constants/environment';
 
 interface NextJSClientLoggerOptions {

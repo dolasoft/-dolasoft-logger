@@ -11,7 +11,13 @@ vi.mock('react', () => ({
 }));
 
 describe('useLogger', () => {
-  let mockLogger: any;
+  let mockLogger: {
+    debug: ReturnType<typeof vi.fn>;
+    info: ReturnType<typeof vi.fn>;
+    warn: ReturnType<typeof vi.fn>;
+    error: ReturnType<typeof vi.fn>;
+    fatal: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     mockLogger = {

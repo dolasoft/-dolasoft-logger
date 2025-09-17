@@ -120,7 +120,7 @@ export class FileAdapter implements LogAdapter {
   }
 
   private formatLogEntry(entry: LogEntry): string {
-    const baseLog: any = {};
+    const baseLog: Record<string, unknown> = {};
 
     // Add timestamp if enabled
     if (this.fileConfig.includeTimestamp !== false) {
@@ -169,7 +169,7 @@ export class FileAdapter implements LogAdapter {
         await this.rotateFile();
       }
     } catch (error) {
-      // File might not exist yet, ignore
+      console.error('FileAdapter.rotateIfNeeded failed:', error);
     }
   }
 

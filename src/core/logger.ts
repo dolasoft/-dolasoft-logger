@@ -183,7 +183,7 @@ export class LoggerService {
     if (adapterName && this.adapters.has(adapterName)) {
       const adapter = this.adapters.get(adapterName)!;
       if ('query' in adapter) {
-        return (adapter as any).query({ limit });
+        return (adapter as { query: (options: { limit?: number }) => Promise<LogEntry[]> }).query({ limit });
       }
     }
 
@@ -205,13 +205,13 @@ export class LoggerService {
     if (adapterName && this.adapters.has(adapterName)) {
       const adapter = this.adapters.get(adapterName)!;
       if ('clear' in adapter) {
-        await (adapter as any).clear();
+        await (adapter as { clear: () => Promise<void> }).clear();
       }
     } else {
       // Clear all adapters
       for (const adapter of this.adapters.values()) {
         if ('clear' in adapter) {
-          await (adapter as any).clear();
+          await (adapter as { clear: () => Promise<void> }).clear();
         }
       }
     }
@@ -230,7 +230,7 @@ export class LoggerService {
 
     for (const [name, adapter] of this.adapters) {
       if ('getStats' in adapter) {
-        const adapterStats = (adapter as any).getStats();
+        const adapterStats = (adapter as { getStats: () => { count?: number; errors?: number } }).getStats();
         stats[name as keyof LogStats] = adapterStats.count || 0;
         if (adapterStats.errors) {
           stats.errors += adapterStats.errors;

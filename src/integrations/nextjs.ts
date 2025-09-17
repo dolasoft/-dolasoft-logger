@@ -33,7 +33,7 @@ class ServerLogger {
    * Reset the singleton instance (useful for testing)
    */
   static reset(): void {
-    ServerLogger.instance = null as any;
+    ServerLogger.instance = null as unknown as ServerLogger;
   }
 
   // Set context for current request

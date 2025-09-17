@@ -84,7 +84,7 @@ export function createLoggingMiddleware(logger?: LoggerService) {
 export function createErrorHandler(logger?: LoggerService) {
   const loggerInstance = logger || LoggerService.getInstance();
 
-  return (error: Error, req: Request, res: Response, next: NextFunction): void => {
+  return (error: Error, req: Request, res: Response, _next: NextFunction): void => {
     const requestId = req.headers['x-request-id'] as string || generateId();
 
     loggerInstance.error('Unhandled error', error, {
