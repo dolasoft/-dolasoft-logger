@@ -40,6 +40,8 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "build:dev": "NODE_ENV=development rollup -c",
+    "build:prod": "NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
     "test": "vitest",
     "test:watch": "vitest --watch",
@@ -47,8 +49,8 @@
     "test:coverage": "vitest --coverage",
     "test:run": "vitest run",
     "type-check": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run test:run",
-    "release": "npm run build && npm publish"
+    "prepublishOnly": "npm run build:prod && npm run test:run",
+    "release": "npm run build:prod && npm publish"
   },
   "keywords": [
     "logger",
@@ -93,11 +95,13 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
     "@testing-library/react": "^14.0.0",
     "@types/node": "^20.9.0",
     "@types/react": "^18.2.37",
     "@vitest/ui": "^3.2.4",
+    "audit-ci": "^7.0.1",
     "jsdom": "^27.0.0",
     "rollup": "^4.4.0",
     "rollup-plugin-dts": "^6.1.0",
