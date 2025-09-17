@@ -648,14 +648,14 @@ export default function HomePage() {
 
 ## 📖 Documentation
 
-- **[API Reference](API_REFERENCE.md)** - Complete API documentation
-- **[Examples](EXAMPLES.md)** - Comprehensive usage examples across different frameworks
-- **[Testing Guide](TESTING.md)** - How to test your logging implementation
-- **[Contributing](CONTRIBUTING.md)** - Guidelines for contributing to the project
+- **[API Reference](https://github.com/dolasoft/-dolasoft-logger/blob/main/API_REFERENCE.md)** - Complete API documentation
+- **[Examples](https://github.com/dolasoft/-dolasoft-logger/blob/main/EXAMPLES.md)** - Comprehensive usage examples across different frameworks
+- **[Testing Guide](https://github.com/dolasoft/-dolasoft-logger/blob/main/TESTING.md)** - How to test your logging implementation
+- **[Contributing](https://github.com/dolasoft/-dolasoft-logger/blob/main/CONTRIBUTING.md)** - Guidelines for contributing to the project
 
 ## 🤝 Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.
+See [CONTRIBUTING.md](https://github.com/dolasoft/-dolasoft-logger/blob/main/CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.
 
 ## 📄 License
 
