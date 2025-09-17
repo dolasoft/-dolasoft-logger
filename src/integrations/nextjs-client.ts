@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { LoggerService, LogLevel } from '../core';
-import { LogStrategy } from '../core/types';
+import { ClientLoggerService } from '../core/client-logger';
+import { LogLevel, LogStrategy } from '../core/types';
 import type { LogMethod, ErrorLogMethod } from '../core/types';
 import { generateRequestId as _generateRequestId } from '../utils/uuid';
 import { isDevelopment, isProduction } from '../constants/environment';
@@ -9,12 +9,13 @@ interface NextJSClientLoggerOptions {
   appSlug?: string;
   userId?: string;
   requestId?: string;
-  logger?: LoggerService;
+  logger?: ClientLoggerService;
   enableConsole?: boolean;
   enableRemote?: boolean;
   remoteEndpoint?: string;
   strategy?: LogStrategy;
-  level?: import('../core/types').LogLevel;
+  level?: LogLevel;
+  maxMemoryEntries?: number; // Add memory limit control
 }
 
 // Client-side logger hook for Next.js
@@ -24,29 +25,34 @@ export function useNextJSClientLogger(options: NextJSClientLoggerOptions = {}) {
     userId, 
     requestId, 
     logger, 
-    enableConsole = true,
-    enableRemote = false,
+    enableConsole = isDevelopment(), // Only enable console in development
+    enableRemote = isProduction(), // Enable remote logging in production
     remoteEndpoint = '/api/logs',
-    strategy = isDevelopment() ? LogStrategy.CONSOLE : LogStrategy.MEMORY,
-    level = isProduction() ? LogLevel.WARN : LogLevel.DEBUG
+    strategy = isDevelopment() ? LogStrategy.CONSOLE : LogStrategy.REMOTE, // Use REMOTE for production
+    level = isProduction() ? LogLevel.WARN : LogLevel.DEBUG,
+    maxMemoryEntries = 100 // Reduce default memory entries for production
   } = options;
 
-  const loggerRef = useRef<LoggerService | null>(null);
+  const loggerRef = useRef<ClientLoggerService | null>(null);
 
   // Initialize logger on client side
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const clientLogger = logger || LoggerService.getInstance({
+    // Production should NEVER use console logging
+    const shouldEnableConsole = enableConsole && isDevelopment();
+    
+    const clientLogger = logger || ClientLoggerService.getInstance({
       strategy,
       level,
-      enableConsole: enableConsole && (strategy === LogStrategy.CONSOLE || strategy === LogStrategy.HYBRID),
+      enableConsole: shouldEnableConsole,
       enableDatabase: false,
-      enableFile: false
+      enableFile: false,
+      maxMemoryEntries
     });
 
     loggerRef.current = clientLogger;
-  }, [logger, enableConsole]);
+  }, [logger, enableConsole, strategy, level, maxMemoryEntries]);
 
   const logWithContext = useCallback((
     level: LogLevel,
@@ -117,7 +123,10 @@ export function useNextJSClientLogger(options: NextJSClientLoggerOptions = {}) {
         })
       });
     } catch (err) {
-      console.warn('Failed to send log to remote endpoint:', err);
+      // Only log remote errors in development
+      if (isDevelopment()) {
+        console.warn('Failed to send log to remote endpoint:', err);
+      }
     }
   }, [remoteEndpoint]);
 
@@ -146,7 +155,7 @@ export function useNextJSClientLogger(options: NextJSClientLoggerOptions = {}) {
 
 // Client-side logger class for non-React usage
 export class NextJSClientLogger {
-  private logger: LoggerService;
+  private logger: ClientLoggerService;
   private appSlug?: string;
   private userId?: string;
   private requestId?: string;
@@ -159,11 +168,12 @@ export class NextJSClientLogger {
       userId, 
       requestId, 
       logger, 
-      enableConsole = true,
-      enableRemote = false,
+      enableConsole = isDevelopment(), // Only enable console in development
+      enableRemote = isProduction(), // Enable remote logging in production
       remoteEndpoint = '/api/logs',
-      strategy = process.env.NODE_ENV === 'development' ? LogStrategy.CONSOLE : LogStrategy.MEMORY,
-      level = process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.DEBUG
+      strategy = isDevelopment() ? LogStrategy.CONSOLE : LogStrategy.REMOTE, // Use REMOTE for production
+      level = isProduction() ? LogLevel.WARN : LogLevel.DEBUG,
+      maxMemoryEntries = 100 // Reduce default memory entries for production
     } = options;
 
     this.appSlug = appSlug;
@@ -172,12 +182,16 @@ export class NextJSClientLogger {
     this.enableRemote = enableRemote;
     this.remoteEndpoint = remoteEndpoint;
 
-    this.logger = logger || LoggerService.getInstance({
+    // Production should NEVER use console logging
+    const shouldEnableConsole = enableConsole && isDevelopment();
+
+    this.logger = logger || ClientLoggerService.getInstance({
       strategy,
       level,
-      enableConsole: enableConsole && (strategy === LogStrategy.CONSOLE || strategy === LogStrategy.HYBRID),
+      enableConsole: shouldEnableConsole,
       enableDatabase: false,
-      enableFile: false
+      enableFile: false,
+      maxMemoryEntries
     });
   }
 
@@ -221,7 +235,10 @@ export class NextJSClientLogger {
         })
       });
     } catch (err) {
-      console.warn('Failed to send log to remote endpoint:', err);
+      // Only log remote errors in development
+      if (isDevelopment()) {
+        console.warn('Failed to send log to remote endpoint:', err);
+      }
     }
   }
 
@@ -261,5 +278,6 @@ export function createNextJSClientLogger(options: NextJSClientLoggerOptions = {}
   return new NextJSClientLogger(options);
 }
 
-// Export types
+// Export types and enums
 export type { NextJSClientLoggerOptions };
+export { LogLevel, LogStrategy };

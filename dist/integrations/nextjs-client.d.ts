@@ -55,28 +55,23 @@ interface LogStats {
 type LogMethod = (message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) => void;
 type ErrorLogMethod = (message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>) => void;
 
-declare class LoggerService {
+/**
+ * Client-side logger service that only includes browser-compatible adapters
+ * (Console and Memory adapters only - no File or Database adapters)
+ */
+declare class ClientLoggerService {
     private static instance;
     private config;
     private adapters;
     private constructor();
-    /**
-     * Get the singleton instance of LoggerService
-     */
-    static getInstance(config?: Partial<LoggerConfig>): LoggerService;
-    /**
-     * Create a new instance (for testing or multiple loggers)
-     */
-    static create(config?: Partial<LoggerConfig>): LoggerService;
-    /**
-     * Reset the singleton instance (useful for testing)
-     */
+    static getInstance(config?: Partial<LoggerConfig>): ClientLoggerService;
+    static create(config?: Partial<LoggerConfig>): ClientLoggerService;
     static reset(): void;
     private initializeAdapters;
     private shouldLog;
     private createLogEntry;
     private generateId;
-    private log;
+    log(entry: LogEntry): Promise<void>;
     debug(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
     info(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
     warn(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
@@ -94,7 +89,7 @@ interface NextJSClientLoggerOptions {
     appSlug?: string;
     userId?: string;
     requestId?: string;
-    logger?: LoggerService;
+    logger?: ClientLoggerService;
     enableConsole?: boolean;
     enableRemote?: boolean;
     remoteEndpoint?: string;
@@ -126,5 +121,5 @@ declare class NextJSClientLogger {
 }
 declare function createNextJSClientLogger(options?: NextJSClientLoggerOptions): NextJSClientLogger;
 
-export { NextJSClientLogger, createNextJSClientLogger, useNextJSClientLogger };
+export { LogLevel, LogStrategy, NextJSClientLogger, createNextJSClientLogger, useNextJSClientLogger };
 export type { NextJSClientLoggerOptions };

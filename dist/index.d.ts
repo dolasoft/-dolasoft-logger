@@ -236,11 +236,41 @@ declare const logApiError: (request: NextRequest, message: string, error?: Error
 declare const logApiInfo: (request: NextRequest, message: string, context?: Record<string, unknown>, logger?: LoggerService) => void;
 declare const logApiWarn: (request: NextRequest, message: string, context?: Record<string, unknown>, logger?: LoggerService) => void;
 
+/**
+ * Client-side logger service that only includes browser-compatible adapters
+ * (Console and Memory adapters only - no File or Database adapters)
+ */
+declare class ClientLoggerService {
+    private static instance;
+    private config;
+    private adapters;
+    private constructor();
+    static getInstance(config?: Partial<LoggerConfig>): ClientLoggerService;
+    static create(config?: Partial<LoggerConfig>): ClientLoggerService;
+    static reset(): void;
+    private initializeAdapters;
+    private shouldLog;
+    private createLogEntry;
+    private generateId;
+    log(entry: LogEntry): Promise<void>;
+    debug(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+    info(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+    warn(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+    error(message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+    fatal(message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>): void;
+    getLogs(adapterName?: string, limit?: number): Promise<LogEntry[]>;
+    getErrorLogs(limit?: number): Promise<LogEntry[]>;
+    clearLogs(adapterName?: string): Promise<void>;
+    getStats(): LogStats;
+    updateConfig(newConfig: Partial<LoggerConfig>): void;
+    cleanup(): Promise<void>;
+}
+
 interface NextJSClientLoggerOptions {
     appSlug?: string;
     userId?: string;
     requestId?: string;
-    logger?: LoggerService;
+    logger?: ClientLoggerService;
     enableConsole?: boolean;
     enableRemote?: boolean;
     remoteEndpoint?: string;

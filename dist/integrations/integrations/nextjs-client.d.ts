@@ -1,16 +1,16 @@
-import { LoggerService } from '../core';
-import { LogStrategy } from '../core/types';
+import { ClientLoggerService } from '../core/client-logger';
+import { LogLevel, LogStrategy } from '../core/types';
 import type { LogMethod, ErrorLogMethod } from '../core/types';
 interface NextJSClientLoggerOptions {
     appSlug?: string;
     userId?: string;
     requestId?: string;
-    logger?: LoggerService;
+    logger?: ClientLoggerService;
     enableConsole?: boolean;
     enableRemote?: boolean;
     remoteEndpoint?: string;
     strategy?: LogStrategy;
-    level?: import('../core/types').LogLevel;
+    level?: LogLevel;
 }
 export declare function useNextJSClientLogger(options?: NextJSClientLoggerOptions): {
     debug: LogMethod;
@@ -37,4 +37,5 @@ export declare class NextJSClientLogger {
 }
 export declare function createNextJSClientLogger(options?: NextJSClientLoggerOptions): NextJSClientLogger;
 export type { NextJSClientLoggerOptions };
+export { LogLevel, LogStrategy };
 //# sourceMappingURL=nextjs-client.d.ts.map

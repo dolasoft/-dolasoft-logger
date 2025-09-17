@@ -11,7 +11,8 @@ export enum LogStrategy {
   MEMORY = 'memory',
   DATABASE = 'database',
   FILE = 'file',
-  HYBRID = 'hybrid'
+  HYBRID = 'hybrid',
+  REMOTE = 'remote'
 }
 
 export interface LogEntry {
