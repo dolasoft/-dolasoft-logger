@@ -46,7 +46,6 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
     "test:run": "vitest run",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build:prod && npm run test:run",

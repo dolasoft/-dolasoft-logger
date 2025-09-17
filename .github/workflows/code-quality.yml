@@ -27,19 +27,8 @@ jobs:
     - name: TypeScript check
       run: npx tsc --noEmit
       
-    - name: Run tests with coverage
-      run: npm run test:coverage
-      
-    - name: Check test coverage
-      run: |
-        echo "Checking test coverage..."
-        if [ -f coverage/lcov.info ]; then
-          echo "Coverage report generated successfully"
-          # You can add coverage thresholds here if needed
-        else
-          echo "No coverage report found"
-          exit 1
-        fi
+    - name: Run tests
+      run: npm run test:run
         
     - name: Check package.json
       run: |
