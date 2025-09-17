@@ -1,0 +1,22 @@
+export { LoggerService } from './core/logger';
+export { createConfig, validateConfig } from './core/config';
+export * from './core/types';
+export { ConsoleAdapter } from './adapters/console';
+export { MemoryAdapter } from './adapters/memory';
+export { DatabaseAdapter } from './adapters/database';
+export { FileAdapter } from './adapters/file';
+export { useLogger } from './integrations/react';
+export { getServerLogger, logApiError, logApiInfo, logApiWarn, ServerLogger } from './integrations/nextjs';
+export { useNextJSClientLogger, NextJSClientLogger, createNextJSClientLogger } from './integrations/nextjs-client';
+export { createLoggingMiddleware, createErrorHandler, createExpressLogger } from './integrations/express';
+export { generateUUID, generateShortId, generateRequestId } from './utils/uuid';
+export { SingletonManager, resetAllSingletons, areSingletonsInitialized } from './utils/singleton-manager';
+import { LoggerService } from './core/logger';
+export declare function getLogger(config?: Partial<import('./core/types').LoggerConfig>): LoggerService;
+export declare const logError: (message: string, error?: Error, context?: Record<string, unknown>) => void;
+export declare const logInfo: (message: string, context?: Record<string, unknown>) => void;
+export declare const logWarn: (message: string, context?: Record<string, unknown>) => void;
+export declare const logDebug: (message: string, context?: Record<string, unknown>) => void;
+export declare const logFatal: (message: string, error?: Error, context?: Record<string, unknown>) => void;
+export default getLogger;
+//# sourceMappingURL=index.d.ts.map
