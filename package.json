@@ -1,6 +1,6 @@
 {
   "name": "@dolasoftfree/logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Enterprise-grade logging library with multiple adapters and framework integrations",
   "main": "dist/index.js",
