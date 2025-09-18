@@ -61,6 +61,12 @@ module.exports = [
         file: packageJson.module,
         format: 'esm',
         sourcemap: true
+      },
+      {
+        file: 'dist/browser.js',
+        format: 'umd',
+        name: 'DolaSoftLogger',
+        sourcemap: true
       }
     ],
     plugins: getPlugins(),

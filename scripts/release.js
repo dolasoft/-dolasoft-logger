@@ -15,19 +15,15 @@ if (!['patch', 'minor', 'major'].includes(versionType)) {
 console.log(`🚀 Releasing ${versionType} version...`);
 
 try {
-  // 1. Run tests
-  console.log('🧪 Running tests...');
-  execSync('npm run test:run', { stdio: 'inherit' });
+  // 1. Run all checks (lint, type-check, tests, build)
+  console.log('🔍 Running all checks...');
+  execSync('npm run check', { stdio: 'inherit' });
 
-  // 2. Build package
-  console.log('🔨 Building package...');
-  execSync('npm run build:prod', { stdio: 'inherit' });
-
-  // 3. Update version
+  // 2. Update version
   console.log(`📦 Updating version (${versionType})...`);
   execSync(`npm version ${versionType}`, { stdio: 'inherit' });
 
-  // 4. Push to GitHub
+  // 3. Push to GitHub
   console.log('📤 Pushing to GitHub...');
   execSync('git push && git push --tags', { stdio: 'inherit' });
 

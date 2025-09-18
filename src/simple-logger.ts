@@ -1,12 +1,14 @@
 // Simple Logger - just the essentials
 import { ConsoleAdapter } from './adapters/console';
+import { FileAdapter } from './adapters/file';
+import { RemoteAdapter } from './adapters/remote';
 import { createConfig, validateConfig } from './core/config';
-import { LogLevel, LoggerConfig, LogEntry } from './core/types';
+import { LogLevel, LoggerConfig, LogEntry, LogAdapter } from './core/types';
 import { generateUUID } from './utils/uuid';
 
 export class SimpleLogger {
   private config: LoggerConfig;
-  private consoleAdapter: ConsoleAdapter;
+  private adapters: LogAdapter[] = [];
 
   constructor(config: Partial<LoggerConfig> = {}) {
     this.config = createConfig(config);
@@ -17,9 +19,36 @@ export class SimpleLogger {
       throw new Error(`Invalid logger configuration: ${errors.join(', ')}`);
     }
 
-    // Initialize console adapter
-    this.consoleAdapter = new ConsoleAdapter();
-    this.consoleAdapter.configure(this.config);
+    // Initialize adapters based on environment and config
+    this.initializeAdapters();
+  }
+
+  private initializeAdapters() {
+    const adapterConfigs = [
+      { 
+        enabled: true, 
+        adapter: ConsoleAdapter, 
+        name: 'console' 
+      },
+      { 
+        enabled: this.config.enableFile, 
+        adapter: FileAdapter, 
+        name: 'file' 
+      },
+      { 
+        enabled: this.config.enableRemote, 
+        adapter: RemoteAdapter, 
+        name: 'remote' 
+      }
+    ];
+
+    adapterConfigs.forEach(({ enabled, adapter }) => {
+      if (enabled) {
+        const adapterInstance = new adapter();
+        adapterInstance.configure(this.config);
+        this.adapters.push(adapterInstance);
+      }
+    });
   }
 
   debug(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) {
@@ -68,10 +97,12 @@ export class SimpleLogger {
       source: this.getSource()
     };
 
-    // Log to console
-    if (this.config.enableConsole) {
-      this.consoleAdapter.log(logEntry);
-    }
+    // Log to all enabled adapters
+    this.adapters.forEach(adapter => {
+      adapter.log(logEntry).catch(err => {
+        console.error(`Failed to log to ${adapter.name} adapter:`, err);
+      });
+    });
   }
 
   private getSource(): string {
@@ -86,41 +117,33 @@ export class SimpleLogger {
 
   updateConfig(newConfig: Partial<LoggerConfig>) {
     this.config = { ...this.config, ...newConfig };
-    this.consoleAdapter.configure(this.config);
+    
+    // Reinitialize adapters with new config
+    this.adapters = [];
+    this.initializeAdapters();
   }
 }
 
-// Create default logger instance
+// Singleton logger instance
 let defaultLogger: SimpleLogger | null = null;
 
 export function getLogger(config?: Partial<LoggerConfig>): SimpleLogger {
   if (!defaultLogger) {
     defaultLogger = new SimpleLogger(config);
-  }
-  if (config) {
+  } else if (config) {
     defaultLogger.updateConfig(config);
   }
   return defaultLogger;
 }
 
-// Convenience functions
-export const log = {
-  debug: (message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) => {
-    getLogger().debug(message, context, metadata);
-  },
-  info: (message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) => {
-    getLogger().info(message, context, metadata);
-  },
-  warn: (message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) => {
-    getLogger().warn(message, context, metadata);
-  },
-  error: (message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>) => {
-    getLogger().error(message, error, context, metadata);
-  },
-  fatal: (message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>) => {
-    getLogger().fatal(message, error, context, metadata);
+// Universal convenience functions - work everywhere, no setup needed
+// This creates a proxy that lazily initializes the logger
+export const log = new Proxy({} as SimpleLogger, {
+  get(target, prop) {
+    const logger = getLogger();
+    return logger[prop as keyof SimpleLogger];
   }
-};
+});
 
 // Export types
 export type { LoggerConfig, LogLevel, LogStrategy, LogEntry } from './core/types';

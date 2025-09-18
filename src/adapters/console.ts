@@ -8,8 +8,35 @@ export class ConsoleAdapter implements LogAdapter {
     this.config = config;
   }
 
+  private isDevelopment(): boolean {
+    // Allow override for testing
+    if (this.config.forceConsole) {
+      return true;
+    }
+    
+    // Check Node.js environment
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev';
+    }
+    
+    // Check browser environment
+    if (typeof window !== 'undefined') {
+      return window.location?.hostname === 'localhost' || 
+             window.location?.hostname === '127.0.0.1' ||
+             window.location?.hostname?.includes('localhost');
+    }
+    
+    // Default to development if we can't determine
+    return true;
+  }
+
   async log(entry: LogEntry): Promise<void> {
     if (!this.config.enableConsole) return;
+
+    // Only log to console in development
+    const isDevelopment = this.isDevelopment();
+    
+    if (!isDevelopment) return;
 
     const timestamp = entry.timestamp.toISOString();
     const levelName = LogLevel[entry.level];

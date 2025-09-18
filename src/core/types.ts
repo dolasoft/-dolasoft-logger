@@ -51,6 +51,13 @@ export interface LoggerConfig {
   includeTimestamp?: boolean;
   includeLevel?: boolean;
   remoteEndpoint?: string;
+  forceConsole?: boolean; // For testing - forces console logging
+  remoteConfig?: {
+    url: string;
+    apiKey?: string;
+    headers?: Record<string, string>;
+    timeout?: number;
+  };
 }
 
 export interface LogAdapter {

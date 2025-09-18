@@ -1,12 +1,17 @@
 // Simple Logger - Main Entry Point
-export { SimpleLogger, getLogger, log } from './simple-logger';
-export { SimpleLoggerProvider, useLogger } from './simple-react-provider';
+// Universal logging - works everywhere, no setup needed
+export { log, getLogger, SimpleLogger } from './simple-logger';
+
+// React integration (optional)
+export { useLogger } from './use-logger';
+
+// Advanced usage (optional)
 export { ConsoleAdapter } from './adapters/console';
 export { FileAdapter } from './adapters/file';
+export { RemoteAdapter } from './adapters/remote';
 export { generateUUID, generateShortId, generateRequestId } from './utils/uuid';
 export { createConfig, validateConfig } from './core/config';
 export type { LoggerConfig, LogLevel, LogStrategy, LogEntry } from './core/types';
 
-// Default export
-import { getLogger } from './simple-logger';
-export default getLogger;
+// Default export - the universal log object
+export { log as default } from './simple-logger';

@@ -1,10 +1,18 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { SimpleLogger, getLogger, log } from '../src/simple-logger';
 import { LogLevel } from '../src/core/types';
 
+interface ConsoleSpy {
+  log: Mock;
+  info: Mock;
+  warn: Mock;
+  error: Mock;
+  debug: Mock;
+}
+
 describe('SimpleLogger', () => {
   let logger: SimpleLogger;
-  let consoleSpy: any;
+  let consoleSpy: ConsoleSpy;
 
   beforeEach(() => {
     consoleSpy = {
@@ -18,10 +26,13 @@ describe('SimpleLogger', () => {
     // Mock console
     Object.assign(console, consoleSpy);
     
-    // Create a new logger instance
+    // Create a new logger instance with console forced on for testing
     logger = new SimpleLogger({
       level: LogLevel.DEBUG,
-      enableConsole: true
+      enableConsole: true,
+      enableFile: false,
+      enableRemote: false,
+      forceConsole: true // Force console logging for tests
     });
   });
 
@@ -84,7 +95,8 @@ describe('SimpleLogger', () => {
     it('should log info messages when level is INFO', () => {
       const infoLogger = new SimpleLogger({
         level: LogLevel.INFO,
-        enableConsole: true
+        enableConsole: true,
+        forceConsole: true // Force console for test
       });
       
       infoLogger.info('This should appear');
@@ -94,6 +106,13 @@ describe('SimpleLogger', () => {
 
   describe('Convenience Functions', () => {
     it('should work with convenience log functions', () => {
+      // Configure the singleton logger for testing
+      getLogger({
+        level: LogLevel.DEBUG,
+        enableConsole: true,
+        forceConsole: true
+      });
+      
       log.debug('Convenience debug');
       log.info('Convenience info');
       log.warn('Convenience warn');
