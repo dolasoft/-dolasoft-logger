@@ -26,10 +26,23 @@ log.error('API failed', error, { endpoint: '/api/users' });
 
 - **🎯 Fixed Enum Exports**: `LogLevel` and `LogStrategy` now properly exported
 - **🔧 Zero Configuration**: Automatic environment detection and setup
-- **📱 Next.js Optimized**: Separate dev/prod log files and configurations
+- **📱 Next.js Optimized**: `nextjsLogger` with separate dev/prod log files
 - **🏷️ Global App Context**: Set `appSlug` globally, `userId`/`requestId` per-call
 - **⚡ Performance**: Optimized logger calls and reduced duplication
 - **🧪 Enhanced Types**: Better TypeScript support with proper exports
+- **🏗️ BaseLogger Class**: Inheritance-based logger implementations
+- **📦 New Exports**: `BaseLogger`, `NextJSLogger`, `nextjsLogger`
+
+## 📦 Available Exports
+
+| Export | Description | Usage |
+|--------|-------------|-------|
+| `log` | Universal logger (zero config) | `import { log } from '@dolasoftfree/logger'` |
+| `nextjsLogger` | Next.js optimized logger | `import { nextjsLogger } from '@dolasoftfree/logger'` |
+| `BaseLogger` | Base class for custom loggers | `import { BaseLogger } from '@dolasoftfree/logger'` |
+| `NextJSLogger` | Next.js logger class | `import { NextJSLogger } from '@dolasoftfree/logger'` |
+| `LogLevel`, `LogStrategy` | Enums for configuration | `import { LogLevel, LogStrategy } from '@dolasoftfree/logger'` |
+| `getLogger` | Create logger instances | `import { getLogger } from '@dolasoftfree/logger'` |
 
 ## 📋 Usage Table
 
@@ -91,10 +104,10 @@ getLogger({
 For Next.js apps, use the optimized logger:
 
 ```typescript
-import { logger } from '@dolasoftfree/logger/nextjs-logger';
+import { nextjsLogger } from '@dolasoftfree/logger';
 
 // Zero config - automatically detects server/client
-logger.info('User action', { 
+nextjsLogger.info('User action', { 
   userId: 'user-123',      // Per-call context
   requestId: 'req-456',    // Per-call context
   action: 'login'          // Regular context
@@ -163,11 +176,11 @@ function MyComponent() {
 ### Next.js (Zero Config)
 ```tsx
 // app/page.tsx
-import { logger } from '@dolasoftfree/logger/nextjs-logger';
+import { nextjsLogger } from '@dolasoftfree/logger';
 
 export default function Page() {
   return (
-    <button onClick={() => logger.info('Button clicked', { 
+    <button onClick={() => nextjsLogger.info('Button clicked', { 
       userId: 'user-123',
       component: 'Button' 
     })}>
@@ -180,10 +193,10 @@ export default function Page() {
 ### Next.js (API Routes)
 ```typescript
 // app/api/users/route.ts
-import { logger } from '@dolasoftfree/logger/nextjs-logger';
+import { nextjsLogger } from '@dolasoftfree/logger';
 
 export async function GET(request: Request) {
-  logger.info('API called', {
+  nextjsLogger.info('API called', {
     userId: 'user-123',
     requestId: 'req-456',
     endpoint: '/api/users'
