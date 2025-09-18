@@ -3,27 +3,27 @@ import { ConsoleAdapter } from './adapters/console';
 import { FileAdapter } from './adapters/file';
 import { RemoteAdapter } from './adapters/remote';
 import { createConfig, validateConfig } from './core/config';
-import { LogLevel, LoggerConfig, LogEntry, LogAdapter } from './core/types';
-import { generateUUID } from './utils/uuid';
+import { LoggerConfig } from './core/types';
+import { BaseLogger } from './core/base-logger';
 
-export class SimpleLogger {
-  private config: LoggerConfig;
-  private adapters: LogAdapter[] = [];
-
+export class SimpleLogger extends BaseLogger {
   constructor(config: Partial<LoggerConfig> = {}) {
-    this.config = createConfig(config);
+    super(config);
+  }
+
+  protected createConfig(overrides: Partial<LoggerConfig>): LoggerConfig {
+    const config = createConfig(overrides);
     
     // Validate configuration
-    const errors = validateConfig(this.config);
+    const errors = validateConfig(config);
     if (errors.length > 0) {
       throw new Error(`Invalid logger configuration: ${errors.join(', ')}`);
     }
 
-    // Initialize adapters based on environment and config
-    this.initializeAdapters();
+    return config;
   }
 
-  private initializeAdapters() {
+  protected initializeAdapters() {
     const adapterConfigs = [
       { 
         enabled: true, 
@@ -49,78 +49,6 @@ export class SimpleLogger {
         this.adapters.push(adapterInstance);
       }
     });
-  }
-
-  debug(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) {
-    this.log(LogLevel.DEBUG, message, context, metadata);
-  }
-
-  info(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) {
-    this.log(LogLevel.INFO, message, context, metadata);
-  }
-
-  warn(message: string, context?: Record<string, unknown>, metadata?: Record<string, unknown>) {
-    this.log(LogLevel.WARN, message, context, metadata);
-  }
-
-  error(message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>) {
-    this.log(LogLevel.ERROR, message, context, metadata, error);
-  }
-
-  fatal(message: string, error?: Error, context?: Record<string, unknown>, metadata?: Record<string, unknown>) {
-    this.log(LogLevel.FATAL, message, context, metadata, error);
-  }
-
-  private log(
-    level: LogLevel,
-    message: string,
-    context?: Record<string, unknown>,
-    metadata?: Record<string, unknown>,
-    error?: Error
-  ) {
-    if (level < this.config.level) {
-      return;
-    }
-
-    const logEntry: LogEntry = {
-      id: generateUUID(),
-      timestamp: new Date(),
-      level,
-      message,
-      context: { ...context },
-      metadata: { ...metadata },
-      error: error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      } : undefined,
-      source: this.getSource()
-    };
-
-    // Log to all enabled adapters
-    this.adapters.forEach(adapter => {
-      adapter.log(logEntry).catch(err => {
-        console.error(`Failed to log to ${adapter.name} adapter:`, err);
-      });
-    });
-  }
-
-  private getSource(): string {
-    if (typeof window !== 'undefined') {
-      return 'browser';
-    }
-    if (typeof process !== 'undefined' && process.versions?.node) {
-      return 'node';
-    }
-    return 'unknown';
-  }
-
-  updateConfig(newConfig: Partial<LoggerConfig>) {
-    this.config = { ...this.config, ...newConfig };
-    
-    // Reinitialize adapters with new config
-    this.adapters = [];
-    this.initializeAdapters();
   }
 }
 

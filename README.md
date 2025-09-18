@@ -6,7 +6,7 @@
 [![CI](https://github.com/dolasoft/-dolasoft-logger/workflows/CI/badge.svg)](https://github.com/dolasoft/-dolasoft-logger/actions)
 [![Bundlephobia](https://img.shields.io/bundlephobia/minzip/@dolasoftfree/logger)](https://bundlephobia.com/package/@dolasoftfree/logger)
 
-**Universal logging library that works everywhere - no setup required.**
+**Universal logging library that works everywhere - zero configuration required.**
 
 ## 🚀 Quick Start
 
@@ -17,18 +17,19 @@ npm install @dolasoftfree/logger
 ```typescript
 import { log } from '@dolasoftfree/logger';
 
-// Works immediately - no setup needed
+// Works immediately - zero config needed
 log.info('User logged in', { userId: '123' });
 log.error('API failed', error, { endpoint: '/api/users' });
 ```
 
-## ✨ What's New in v2.0.1
+## ✨ What's New in v2.0.3
 
-- **🎯 New Remote Adapter**: Send logs to external APIs (Sentry, DataDog, etc.)
-- **📁 Enhanced File Adapter**: Better file rotation and error handling
-- **🔧 Improved Configuration**: More flexible setup options
-- **⚡ Better Performance**: Optimized for production use
-- **🧪 Comprehensive Tests**: 64 tests covering all adapters
+- **🎯 Fixed Enum Exports**: `LogLevel` and `LogStrategy` now properly exported
+- **🔧 Zero Configuration**: Automatic environment detection and setup
+- **📱 Next.js Optimized**: Separate dev/prod log files and configurations
+- **🏷️ Global App Context**: Set `appSlug` globally, `userId`/`requestId` per-call
+- **⚡ Performance**: Optimized logger calls and reduced duplication
+- **🧪 Enhanced Types**: Better TypeScript support with proper exports
 
 ## 📋 Usage Table
 
@@ -52,18 +53,30 @@ log.error('API failed', error, { endpoint: '/api/users' });
 
 ## ⚙️ Configuration
 
+### Zero Configuration (Recommended)
+The logger works out of the box with sensible defaults:
+
+```typescript
+import { log } from '@dolasoftfree/logger';
+
+// Works immediately - no setup needed
+log.info('App started');
+```
+
+### Advanced Configuration
 Configure once at your app's entry point:
 
 ```typescript
-import { getLogger } from '@dolasoftfree/logger';
+import { getLogger, LogLevel, LogStrategy } from '@dolasoftfree/logger';
 
 // Configure once at app start
 getLogger({
-  level: 'info',           // Log level: debug, info, warn, error, fatal
+  strategy: LogStrategy.CONSOLE,
+  level: LogLevel.INFO,
   enableConsole: true,     // Console logging (dev only by default)
   enableFile: true,        // File logging (Node.js only)
   enableRemote: true,      // Remote logging (Sentry, etc.)
-  forceConsole: false,     // Force console logging (for testing)
+  appSlug: 'my-app',       // Global app identifier
   filePath: './logs/app.log',
   maxFileSize: 10 * 1024 * 1024, // 10MB
   maxFiles: 5,             // Keep 5 rotated files
@@ -71,6 +84,20 @@ getLogger({
     url: 'https://your-api.com/logs',
     apiKey: 'your-api-key'
   }
+});
+```
+
+### Next.js Specific Configuration
+For Next.js apps, use the optimized logger:
+
+```typescript
+import { logger } from '@dolasoftfree/logger/nextjs-logger';
+
+// Zero config - automatically detects server/client
+logger.info('User action', { 
+  userId: 'user-123',      // Per-call context
+  requestId: 'req-456',    // Per-call context
+  action: 'login'          // Regular context
 });
 ```
 
@@ -133,20 +160,114 @@ function MyComponent() {
 }
 ```
 
-### Next.js
+### Next.js (Zero Config)
 ```tsx
-// app/layout.tsx
-import { getLogger } from '@dolasoftfree/logger';
-
-// Configure once
-getLogger({ level: 'info' });
-
 // app/page.tsx
-import { log } from '@dolasoftfree/logger';
+import { logger } from '@dolasoftfree/logger/nextjs-logger';
 
 export default function Page() {
   return (
-    <button onClick={() => log.info('Button clicked')}>
+    <button onClick={() => logger.info('Button clicked', { 
+      userId: 'user-123',
+      component: 'Button' 
+    })}>
+      Click me
+    </button>
+  );
+}
+```
+
+### Next.js (API Routes)
+```typescript
+// app/api/users/route.ts
+import { logger } from '@dolasoftfree/logger/nextjs-logger';
+
+export async function GET(request: Request) {
+  logger.info('API called', {
+    userId: 'user-123',
+    requestId: 'req-456',
+    endpoint: '/api/users'
+  });
+  
+  return Response.json({ users: [] });
+}
+```
+
+### Custom Logger with Base Class
+Create your own logger by extending the BaseLogger class:
+
+```typescript
+// utils/custom-logger.ts
+import { BaseLogger, LogLevel, LogStrategy, LoggerConfig } from '@dolasoftfree/logger';
+
+class MyCustomLogger extends BaseLogger {
+  private isServer: boolean;
+  private isProduction: boolean;
+
+  constructor(config: Partial<LoggerConfig> = {}) {
+    this.isServer = typeof window === 'undefined';
+    this.isProduction = process.env.NODE_ENV === 'production';
+    super(config);
+  }
+
+  protected createConfig(overrides: Partial<LoggerConfig>): LoggerConfig {
+    return {
+      strategy: LogStrategy.CONSOLE,
+      level: this.isProduction ? LogLevel.INFO : LogLevel.DEBUG,
+      enableConsole: true,
+      enableFile: this.isServer && this.isProduction,
+      enableDatabase: false,
+      enableRemote: false,
+      enableMemory: false,
+      format: this.isProduction ? 'json' : 'pretty',
+      filePath: this.isProduction ? './logs/my-app-prod.log' : './logs/my-app-dev.log',
+      maxFileSize: 10 * 1024 * 1024,
+      maxFiles: 5,
+      includeStack: true,
+      includeMetadata: true,
+      includeTimestamp: true,
+      includeLevel: true,
+      appSlug: process.env.APP_SLUG || 'my-custom-app',
+      ...overrides
+    };
+  }
+
+  protected initializeAdapters() {
+    // Add your custom adapters here
+    // The base class handles the core logging logic
+  }
+
+  protected getSource(): string {
+    return this.isServer ? 'my-app-server' : 'my-app-client';
+  }
+}
+
+// Create singleton instance
+const customLogger = new MyCustomLogger();
+
+export default customLogger;
+```
+
+### Benefits of Base Class Approach
+
+✅ **Eliminates Duplication**: Common logging logic is shared  
+✅ **Consistent Interface**: All loggers have the same API  
+✅ **Easy Customization**: Override only what you need  
+✅ **Type Safety**: Full TypeScript support  
+✅ **Maintainable**: Changes to base class benefit all loggers  
+✅ **Testable**: Easy to mock and test individual loggers
+
+### Usage with Custom Logger
+```typescript
+// app/page.tsx
+import { customLogger } from '@/utils/logger';
+
+export default function Page() {
+  return (
+    <button onClick={() => customLogger.info('Custom log', { 
+      userId: 'user-123',
+      component: 'Button' 
+    })}>
       Click me
     </button>
   );

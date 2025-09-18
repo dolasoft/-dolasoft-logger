@@ -52,6 +52,8 @@ export interface LoggerConfig {
   includeLevel?: boolean;
   remoteEndpoint?: string;
   forceConsole?: boolean; // For testing - forces console logging
+  // Global app identifier - applied to all log entries
+  appSlug?: string;
   remoteConfig?: {
     url: string;
     apiKey?: string;
