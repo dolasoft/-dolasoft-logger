@@ -8,7 +8,7 @@
     "build": "tsc",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "prepublishOnly": "npm run lint && npm run test && npm run build",
+    "prepublishOnly": "npm run lint && npm run type-check && npm run test && npm run build",
     "test": "vitest run",
     "test:coverage": "vitest --coverage",
     "lint": "eslint . --fix",
