@@ -13,6 +13,7 @@
     "test:coverage": "vitest --coverage",
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
+    "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
   },
