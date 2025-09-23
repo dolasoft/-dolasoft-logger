@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+*.log
+.eslintcache
+example*.js
+vitest.config.ts
+vitest.setup.ts

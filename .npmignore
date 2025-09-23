@@ -1,0 +1,41 @@
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Config files
+tsconfig.json
+.gitignore
+.npmignore
+eslint.config.mjs
+.eslintignore
+.prettierrc
+vitest.config.ts
+vitest.setup.ts
+
+# Examples and docs
+example*.js
+docs/
+
+# IDE
+.vscode/
+.idea/
+
+# Development
+node_modules/
+coverage/
+.nyc_output/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*

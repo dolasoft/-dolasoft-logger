@@ -1,321 +1,416 @@
 # @dolasoftfree/logger
 
-[![npm version](https://badge.fury.io/js/%40dolasoftfree%2Flogger.svg)](https://badge.fury.io/js/%40dolasoftfree%2Flogger)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
-[![CI](https://github.com/dolasoft/-dolasoft-logger/workflows/CI/badge.svg)](https://github.com/dolasoft/-dolasoft-logger/actions)
-[![Bundlephobia](https://img.shields.io/bundlephobia/minzip/@dolasoftfree/logger)](https://bundlephobia.com/package/@dolasoftfree/logger)
+A comprehensive logging system that combines execution tracking, trace logging, and general logging capabilities into a single, unified interface with automatic production safety.
 
-**Universal logging library that works everywhere - zero configuration required.**
+## Features
 
-## 🚀 Quick Start
+- 🚀 **Multiple logging modes**: Console, HTTP route, both, or none
+- 📊 **Session management**: Track complex operations with session-based logging
+- ⏱️ **Execution tracking**: Monitor step-by-step execution with timing information
+- 🔍 **Trace logging**: Detailed trace logs with emoji indicators
+- 🔐 **Data sanitization**: Automatic removal of sensitive information
+- 🌐 **Environment configuration**: Flexible configuration via environment variables
+- 📝 **TypeScript support**: Full type definitions included
+- 🔒 **Production safety**: Automatic console silencing in production environments
+- 🎯 **Singleton pattern**: Ensures consistent logging across your application
+
+## Installation
 
 ```bash
 npm install @dolasoftfree/logger
 ```
 
-```typescript
-import { log } from '@dolasoftfree/logger';
+## Quick Start
 
-// Works immediately - zero config needed
-log.info('User logged in', { userId: '123' });
-log.error('API failed', error, { endpoint: '/api/users' });
+```typescript
+import { getLogger } from '@dolasoftfree/logger';
+
+// Get the logger instance
+const logger = getLogger();
+
+logger.info('Application started');
+logger.debug('Debug information', { userId: 123 });
+logger.warn('Warning message');
+logger.error('Error occurred', new Error('Something went wrong'));
+
+// Session-based logging
+logger.startSession('user-123', 'trace');
+logger.addTraceStep('start', '🚀 Starting operation');
+// ... perform operations
+logger.addTraceStep('complete', '✅ Operation completed');
+const session = logger.endSession();
 ```
 
-## ✨ What's New in v2.0.3
+## Configuration
 
-- **🎯 Fixed Enum Exports**: `LogLevel` and `LogStrategy` now properly exported
-- **🔧 Zero Configuration**: Automatic environment detection and setup
-- **📱 Next.js Optimized**: `nextjsLogger` with separate dev/prod log files
-- **🏷️ Global App Context**: Set `appSlug` globally, `userId`/`requestId` per-call
-- **⚡ Performance**: Optimized logger calls and reduced duplication
-- **🧪 Enhanced Types**: Better TypeScript support with proper exports
-- **🏗️ BaseLogger Class**: Inheritance-based logger implementations
-- **📦 New Exports**: `BaseLogger`, `NextJSLogger`, `nextjsLogger`
+### Using the Singleton Instance
 
-## 📦 Available Exports
-
-| Export | Description | Usage |
-|--------|-------------|-------|
-| `log` | Universal logger (zero config) | `import { log } from '@dolasoftfree/logger'` |
-| `nextjsLogger` | Next.js optimized logger | `import { nextjsLogger } from '@dolasoftfree/logger'` |
-| `BaseLogger` | Base class for custom loggers | `import { BaseLogger } from '@dolasoftfree/logger'` |
-| `NextJSLogger` | Next.js logger class | `import { NextJSLogger } from '@dolasoftfree/logger'` |
-| `LogLevel`, `LogStrategy` | Enums for configuration | `import { LogLevel, LogStrategy } from '@dolasoftfree/logger'` |
-| `getLogger` | Create logger instances | `import { getLogger } from '@dolasoftfree/logger'` |
-
-## 📋 Usage Table
-
-| Method | Description | Example |
-|--------|-------------|---------|
-| `log.debug()` | Debug information | `log.debug('Processing data', { step: 1 })` |
-| `log.info()` | General information | `log.info('User action', { userId: '123' })` |
-| `log.warn()` | Warning messages | `log.warn('Rate limit approaching', { count: 95 })` |
-| `log.error()` | Error messages | `log.error('API failed', error, { endpoint: '/api' })` |
-| `log.fatal()` | Fatal errors | `log.fatal('Database down', error, { service: 'db' })` |
-
-## 🌍 Environment Support
-
-| Environment | Console | File | Remote | Notes |
-|-------------|---------|------|--------|-------|
-| **Browser** | ✅ Dev only | ❌ | ✅ | Console only in development |
-| **Node.js** | ✅ Dev only | ✅ | ✅ | File logging with rotation |
-| **React** | ✅ Dev only | ❌ | ✅ | Use `useLogger()` hook |
-| **Next.js** | ✅ Dev only | ✅ SSR | ✅ | Works in both client/server |
-| **SSR** | ✅ Dev only | ✅ | ✅ | Server-side rendering |
-
-## ⚙️ Configuration
-
-### Zero Configuration (Recommended)
-The logger works out of the box with sensible defaults:
+The package exports a default singleton instance for immediate use:
 
 ```typescript
-import { log } from '@dolasoftfree/logger';
+import { getLogger } from '@dolasoftfree/logger';
 
-// Works immediately - no setup needed
-log.info('App started');
+// Get logger instance
+const logger = getLogger();
+logger.info('Using the singleton logger');
 ```
 
-### Advanced Configuration
-Configure once at your app's entry point:
+### Custom Configuration with getInstance
+
+For custom configuration, use the `getInstance` method:
 
 ```typescript
-import { getLogger, LogLevel, LogStrategy } from '@dolasoftfree/logger';
+import { UnifiedLogger, LOG_MODES } from '@dolasoftfree/logger';
 
-// Configure once at app start
-getLogger({
-  strategy: LogStrategy.CONSOLE,
-  level: LogLevel.INFO,
-  enableConsole: true,     // Console logging (dev only by default)
-  enableFile: true,        // File logging (Node.js only)
-  enableRemote: true,      // Remote logging (Sentry, etc.)
-  appSlug: 'my-app',       // Global app identifier
-  filePath: './logs/app.log',
-  maxFileSize: 10 * 1024 * 1024, // 10MB
-  maxFiles: 5,             // Keep 5 rotated files
-  remoteConfig: {
-    url: 'https://your-api.com/logs',
-    apiKey: 'your-api-key'
-  }
+// Get configured singleton instance
+const logger = UnifiedLogger.getInstance({
+  logMode: LOG_MODES.BOTH,
+  routeUrl: 'http://localhost:3000/api/logs',
+  maxLogs: 1000,
+  maxSessions: 100,
+  sensitiveFields: ['password', 'token', 'secret']
 });
 ```
 
-### Next.js Specific Configuration
-For Next.js apps, use the optimized logger:
+### Environment Variables
+
+Configure the logger behavior using environment variables:
+
+- `LOG_MODE`: Set the logging mode (`console`, `route`, `both`, or `none`)
+- `LOG_ROUTE_URL`: Set the HTTP endpoint for remote logging
+- `LOG_MAX_LOGS`: Positive integer to cap in-memory logs (default 1000)
+- `LOG_MAX_SESSIONS`: Positive integer to cap stored sessions (default 100)
+- `LOG_SENSITIVE_FIELDS`: Comma-separated list of keys to redact (default: password,token,secret,key,apiKey,auth,authorization)
+- `NODE_ENV`: When set to `production`, automatically disables console output
+
+```bash
+export LOG_MODE=both
+export LOG_ROUTE_URL=http://localhost:3000/api/logs
+export LOG_MAX_LOGS=2000
+export LOG_MAX_SESSIONS=250
+export LOG_SENSITIVE_FIELDS=password,token,creditCard,ssn
+export NODE_ENV=production
+```
+
+#### Precedence and Validation
+
+- **LOG_MODE precedence**: `LOG_MODE` (if valid) → `config.logMode` → default `console`.
+- **Valid values**: `console`, `route`, `both`, `none`. Invalid/empty values are ignored.
+- **LOG_ROUTE_URL precedence**: `LOG_ROUTE_URL` (if non-empty) → `config.routeUrl` → default `http://localhost:3000/api/logs`.
+- **Limits precedence**: `LOG_MAX_LOGS`/`LOG_MAX_SESSIONS` (valid positive int) → `config.maxLogs`/`config.maxSessions` → defaults.
+- **Sanitization precedence**: `LOG_SENSITIVE_FIELDS` (comma-separated list) → `config.sensitiveFields` → defaults.
+- **Production behavior**: see Production Safety below — console output is automatically disabled in production when applicable.
+
+Example (invalid `LOG_MODE` is ignored and falls back to config):
+
+```bash
+export LOG_MODE=undefined   # ignored
+```
 
 ```typescript
-import { nextjsLogger } from '@dolasoftfree/logger';
+import { UnifiedLogger, LOG_MODES } from '@dolasoftfree/logger';
 
-// Zero config - automatically detects server/client
-nextjsLogger.info('User action', { 
-  userId: 'user-123',      // Per-call context
-  requestId: 'req-456',    // Per-call context
-  action: 'login'          // Regular context
+const logger = UnifiedLogger.getInstance({ logMode: LOG_MODES.BOTH });
+// Resulting mode will be 'both' because env was invalid
+```
+
+### Log Modes
+
+Use the exported `LOG_MODES` constant for type-safe configuration:
+
+```typescript
+import { UnifiedLogger, LOG_MODES } from '@dolasoftfree/logger';
+
+const logger = UnifiedLogger.getInstance({
+  logMode: LOG_MODES.CONSOLE,  // 'console'
+  // logMode: LOG_MODES.ROUTE,  // 'route'
+  // logMode: LOG_MODES.BOTH,   // 'both'
+  // logMode: LOG_MODES.NONE,   // 'none'
 });
 ```
 
-## 🎯 What to Expect
+### Production Safety
 
-### Development Mode
-- **Console logs**: Pretty formatted, colored output
-- **File logs**: JSON format in `./logs/app.log`
-- **Remote logs**: Sent to your API endpoint
+The logger automatically handles production environments:
 
-### Production Mode
-- **Console logs**: Disabled (performance)
-- **File logs**: JSON format with rotation
-- **Remote logs**: Sent to your API endpoint
-
-### File Rotation
-- **Max size**: 10MB per file (configurable)
-- **Max files**: 5 files (configurable)
-- **Format**: `app.log`, `app.1.log`, `app.2.log`, etc.
-
-## 🎨 Log Levels
-
-| Level | Value | When to Use |
-|-------|-------|-------------|
-| `DEBUG` | 0 | Detailed debugging information |
-| `INFO` | 1 | General application flow |
-| `WARN` | 2 | Potential issues or warnings |
-| `ERROR` | 3 | Handled exceptions and errors |
-| `FATAL` | 4 | Fatal errors that crash the app |
-
-## 📦 Bundle Size
-
-- **Minified**: ~5KB gzipped
-- **Zero dependencies** (except TypeScript types)
-- **Tree-shakeable** - only import what you use
-- **Production ready** - optimized builds with proper exports
-
-## 🚀 Examples
-
-### React Usage
-```tsx
-import { log, useLogger } from '@dolasoftfree/logger';
-
-// Option 1: Direct usage (recommended)
-function MyComponent() {
-  const handleClick = () => {
-    log.info('Button clicked', { buttonId: 'cta' });
-  };
-  return <button onClick={handleClick}>Click me</button>;
-}
-
-// Option 2: Hook (if you prefer)
-function MyComponent() {
-  const logger = useLogger();
-  
-  const handleClick = () => {
-    logger.info('Button clicked', { buttonId: 'cta' });
-  };
-  return <button onClick={handleClick}>Click me</button>;
-}
-```
-
-### Next.js (Zero Config)
-```tsx
-// app/page.tsx
-import { nextjsLogger } from '@dolasoftfree/logger';
-
-export default function Page() {
-  return (
-    <button onClick={() => nextjsLogger.info('Button clicked', { 
-      userId: 'user-123',
-      component: 'Button' 
-    })}>
-      Click me
-    </button>
-  );
-}
-```
-
-### Next.js (API Routes)
-```typescript
-// app/api/users/route.ts
-import { nextjsLogger } from '@dolasoftfree/logger';
-
-export async function GET(request: Request) {
-  nextjsLogger.info('API called', {
-    userId: 'user-123',
-    requestId: 'req-456',
-    endpoint: '/api/users'
-  });
-  
-  return Response.json({ users: [] });
-}
-```
-
-### Custom Logger with Base Class
-Create your own logger by extending the BaseLogger class:
+1. **Automatic Production Detection**: Detects when running in production via `NODE_ENV`
+2. **Console Silencing**: In production:
+   - `console` mode → automatically switches to `none`
+   - `both` mode → automatically switches to `route` only
+   - `route` mode → remains unchanged
+   - `none` mode → remains unchanged
+3. **No Initialization Logs**: Logger initialization messages are suppressed in production
 
 ```typescript
-// utils/custom-logger.ts
-import { BaseLogger, LogLevel, LogStrategy, LoggerConfig } from '@dolasoftfree/logger';
+// In production (NODE_ENV=production):
+const logger = UnifiedLogger.getInstance({ 
+  logMode: LOG_MODES.CONSOLE  // Automatically becomes 'none'
+});
 
-class MyCustomLogger extends BaseLogger {
-  private isServer: boolean;
-  private isProduction: boolean;
+logger.info('This will not appear in console'); // Silent in production
+logger.error('Even errors are silent');         // Silent in production
 
-  constructor(config: Partial<LoggerConfig> = {}) {
-    this.isServer = typeof window === 'undefined';
-    this.isProduction = process.env.NODE_ENV === 'production';
-    super(config);
-  }
+// But route mode still works in production:
+const routeLogger = UnifiedLogger.getInstance({ 
+  logMode: LOG_MODES.ROUTE,
+  routeUrl: 'https://api.example.com/logs'
+});
 
-  protected createConfig(overrides: Partial<LoggerConfig>): LoggerConfig {
-    return {
-      strategy: LogStrategy.CONSOLE,
-      level: this.isProduction ? LogLevel.INFO : LogLevel.DEBUG,
-      enableConsole: true,
-      enableFile: this.isServer && this.isProduction,
-      enableDatabase: false,
-      enableRemote: false,
-      enableMemory: false,
-      format: this.isProduction ? 'json' : 'pretty',
-      filePath: this.isProduction ? './logs/my-app-prod.log' : './logs/my-app-dev.log',
-      maxFileSize: 10 * 1024 * 1024,
-      maxFiles: 5,
-      includeStack: true,
-      includeMetadata: true,
-      includeTimestamp: true,
-      includeLevel: true,
-      appSlug: process.env.APP_SLUG || 'my-custom-app',
-      ...overrides
-    };
-  }
-
-  protected initializeAdapters() {
-    // Add your custom adapters here
-    // The base class handles the core logging logic
-  }
-
-  protected getSource(): string {
-    return this.isServer ? 'my-app-server' : 'my-app-client';
-  }
-}
-
-// Create singleton instance
-const customLogger = new MyCustomLogger();
-
-export default customLogger;
+routeLogger.info('This will be sent to the API'); // Works in production
 ```
 
-### Benefits of Base Class Approach
+## API Reference
 
-✅ **Eliminates Duplication**: Common logging logic is shared  
-✅ **Consistent Interface**: All loggers have the same API  
-✅ **Easy Customization**: Override only what you need  
-✅ **Type Safety**: Full TypeScript support  
-✅ **Maintainable**: Changes to base class benefit all loggers  
-✅ **Testable**: Easy to mock and test individual loggers
+### Singleton Management
 
-### Usage with Custom Logger
 ```typescript
-// app/page.tsx
-import { customLogger } from '@/utils/logger';
+// Get the singleton instance (creates one if it doesn't exist)
+UnifiedLogger.getInstance(config?: UnifiedLoggerConfig): UnifiedLogger
 
-export default function Page() {
-  return (
-    <button onClick={() => customLogger.info('Custom log', { 
-      userId: 'user-123',
-      component: 'Button' 
-    })}>
-      Click me
-    </button>
-  );
+// Reset the singleton instance (useful for testing)
+UnifiedLogger.resetInstance(): void
+```
+
+### General Logging
+
+```typescript
+logger.debug(message: string, context?: unknown, metadata?: unknown): void
+logger.info(message: string, context?: unknown, metadata?: unknown): void
+logger.warn(message: string, context?: unknown, metadata?: unknown): void
+logger.error(message: string, error?: Error | unknown, context?: unknown, metadata?: unknown): void
+```
+
+### Session Management
+
+```typescript
+// Start a new session
+logger.startSession(id: string, type?: 'trace' | 'execution' | 'general', metadata?: Record<string, unknown>): void
+
+// End the current session
+logger.endSession(): Session | null
+
+// Get session information
+logger.getCurrentSession(): Session | null
+logger.getSession(id: string): Session | null
+logger.getAllSessions(): Session[]
+```
+
+### Trace Logging
+
+```typescript
+// Add a trace step
+logger.addTraceStep(level: 'start' | 'complete' | 'error' | 'info', message: string, metadata?: Record<string, unknown>): void
+
+// Start a timed trace step
+logger.startTraceStep(stepName: string, message: string, metadata?: Record<string, unknown>): void
+
+// Complete a timed trace step
+logger.completeTraceStep(stepName: string, message?: string, metadata?: Record<string, unknown>): void
+```
+
+### Execution Tracking
+
+```typescript
+// Start an execution step
+logger.startStep(stepId: string, stepName: string, metadata?: Record<string, unknown>): void
+
+// Complete an execution step
+logger.completeStep(stepId: string, metadata?: Record<string, unknown>): void
+
+// Mark a step as failed
+logger.failStep(stepId: string, error: string): void
+```
+
+### Specialized Methods
+
+```typescript
+// Custom logging with emoji
+logger.logCustom(emoji: string, message: string, metadata?: Record<string, unknown>): void
+
+// Update session metadata dynamically
+logger.updateSessionMetadata(metadata: Record<string, unknown>): void
+```
+
+### Data Retrieval
+
+```typescript
+// Get all logs
+logger.getAllLogs(): LogEntry[]
+
+// Clear old sessions (older than 1 hour)
+logger.clearOldSessions(): void
+```
+
+## Examples
+
+For comprehensive examples and use cases, please see the [Examples Documentation](docs/EXAMPLES.md).
+
+### Basic Logging
+
+```typescript
+import { getLogger } from '@dolasoftfree/logger';
+
+const logger = getLogger();
+
+// Simple logging
+logger.info('Server started on port 3000');
+logger.debug('Database connection established', { db: 'postgres' });
+
+// Error logging with stack trace
+try {
+  // some operation
+} catch (error) {
+  logger.error('Operation failed', error, { operation: 'dataSync' });
 }
 ```
 
-### Browser (UMD)
-```html
-<!-- Load from CDN or local file -->
-<script src="https://unpkg.com/@dolasoftfree/logger/dist/browser.js"></script>
-<script>
-  // Available as window.DolaSoftLogger
-  const { log, getLogger } = window.DolaSoftLogger;
-  
-  log.info('Page loaded', { url: window.location.href });
-</script>
+### Execution Tracking
+
+```typescript
+import { getLogger } from '@dolasoftfree/logger';
+
+const logger = getLogger();
+
+// Start a session
+logger.startSession('import-123', 'execution');
+
+// Track individual steps
+logger.startStep('step1', 'Loading data');
+// ... perform loading
+logger.completeStep('step1', { recordsLoaded: 1000 });
+
+logger.startStep('step2', 'Processing data');
+try {
+  // ... process data
+  logger.completeStep('step2', { recordsProcessed: 950 });
+} catch (error) {
+  logger.failStep('step2', error.message);
+}
+
+// End session
+const session = logger.endSession();
+console.log(`Total duration: ${session.totalDuration}ms`);
 ```
 
-### Node.js/Express
-```javascript
-import { log, getLogger } from '@dolasoftfree/logger';
+### Trace Logging with Timing
 
-// Configure once
-getLogger({ enableFile: true, level: 'info' });
+```typescript
+import { getLogger } from '@dolasoftfree/logger';
 
-app.get('/api/users', (req, res) => {
-  log.info('API called', { endpoint: '/api/users', ip: req.ip });
-  res.json({ users: [] });
+const logger = getLogger();
+
+logger.startSession('analysis-456', 'trace');
+
+logger.startTraceStep('data-fetch', 'Fetching data from API');
+// ... fetch data
+logger.completeTraceStep('data-fetch', 'Data fetched successfully', { 
+  records: 500 
+});
+
+logger.startTraceStep('data-transform', 'Transforming data');
+// ... transform data
+logger.completeTraceStep('data-transform');
+
+logger.endSession();
+```
+
+### Remote Logging
+
+```typescript
+import { UnifiedLogger, LOG_MODES } from '@dolasoftfree/logger';
+
+// Configure for remote logging
+const logger = UnifiedLogger.getInstance({
+  logMode: LOG_MODES.ROUTE,
+  routeUrl: 'https://api.example.com/logs'
+});
+
+// All logs will be sent to the remote endpoint
+logger.info('Remote log entry', { source: 'worker-1' });
+```
+
+### Data Sanitization
+
+```typescript
+import { UnifiedLogger } from '@dolasoftfree/logger';
+
+const logger = UnifiedLogger.getInstance({
+  sensitiveFields: ['password', 'creditCard', 'ssn']
+});
+
+// Sensitive fields will be automatically removed
+logger.info('User login', {
+  username: 'john.doe',
+  password: 'secret123', // This will be removed
+  timestamp: new Date()
 });
 ```
 
-## 📄 License
+### Custom Domain Logging
 
-MIT License - see [LICENSE](LICENSE) file for details.
+```typescript
+import { getLogger } from '@dolasoftfree/logger';
 
----
+const logger = getLogger();
 
-Made with ❤️ by [DolaSoft](https://github.com/dolasoft)
+// Start a session for your specific use case
+logger.startSession('payment-processing', 'trace');
+
+// Use custom logging for domain-specific events
+logger.logCustom('💳', 'Processing payment', { amount: 99.99, currency: 'USD' });
+logger.logCustom('🏦', 'Connecting to payment gateway', { provider: 'stripe' });
+
+// Update session metadata as needed
+logger.updateSessionMetadata({ 
+  transactionId: 'tx_12345',
+  customerType: 'premium' 
+});
+
+// Continue with your domain logic
+logger.logCustom('✅', 'Payment processed successfully');
+logger.endSession();
+```
+
+## Log Modes
+
+1. **console**: Logs only to the console (automatically disabled in production)
+2. **route**: Logs only to the HTTP endpoint
+3. **both**: Logs to both console and HTTP endpoint (console disabled in production)
+4. **none**: Disables all logging output
+
+## Types
+
+The package includes full TypeScript definitions:
+
+```typescript
+import { 
+  LogEntry, 
+  Session, 
+  TraceStep, 
+  ExecutionStep,
+  LogMode,
+  UnifiedLoggerConfig,
+  LOG_MODES
+} from '@dolasoftfree/logger';
+```
+
+## Testing
+
+When writing tests, use the `resetInstance` method to ensure a clean state:
+
+```typescript
+import { UnifiedLogger } from '@dolasoftfree/logger';
+
+beforeEach(() => {
+  UnifiedLogger.resetInstance();
+});
+
+it('should test logging', () => {
+  const logger = UnifiedLogger.getInstance({ logMode: 'none' });
+  // ... your tests
+});
+```
+
+## License
+
+MIT

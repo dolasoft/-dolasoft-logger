@@ -1,112 +1,58 @@
 {
   "name": "@dolasoftfree/logger",
-  "version": "2.0.4",
-  "type": "module",
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "description": "Simple, universal logging library for React, Next.js, and Node.js applications",
+  "version": "3.0.0",
+  "description": "A comprehensive logging system with execution tracking, trace logging, and general logging capabilities",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "README.md",
-    "API_REFERENCE.md",
-    "EXAMPLES.md",
-    "CONTRIBUTING.md",
-    "TESTING.md",
-    "LICENSE"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.js"
-    }
-  },
   "scripts": {
-    "build": "rollup -c",
-    "build:dev": "NODE_ENV=development rollup -c",
-    "build:prod": "NODE_ENV=production rollup -c",
-    "dev": "rollup -c -w",
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "prepublishOnly": "npm run lint && npm run test && npm run build",
     "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx --fix",
-    "check": "npm run lint && npm run type-check && npm run test:run && npm run build:prod",
-    "pre-release": "npm run check && git add . && git commit -m 'chore: prepare for release'",
-    "prepublishOnly": "npm run check",
-    "version": "npm run build:prod",
-    "postversion": "git push && git push --tags",
-    "release": "node scripts/release.js",
-    "release:patch": "node scripts/release.js patch",
-    "release:minor": "node scripts/release.js minor",
-    "release:major": "node scripts/release.js major"
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
   },
   "keywords": [
     "logger",
     "logging",
-    "enterprise",
+    "trace",
+    "execution",
     "typescript",
-    "react",
-    "nextjs",
-    "express",
-    "nodejs",
-    "monitoring",
-    "debugging"
+    "unified-logger",
+    "session-tracking"
   ],
-  "author": {
-    "name": "DolaSoft",
-    "url": "https://github.com/dolasoft"
-  },
+  "author": "DolaSoft",
   "license": "MIT",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^8.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dolasoft/-dolasoft-logger.git"
+    "url": "https://github.com/dolasoft/dolasoft-logger.git"
   },
   "bugs": {
-    "url": "https://github.com/dolasoft/-dolasoft-logger/issues"
+    "url": "https://github.com/dolasoft/dolasoft-logger/issues"
   },
-  "homepage": "https://github.com/dolasoft/-dolasoft-logger#readme",
-  "peerDependencies": {
-    "next": ">=12.0.0",
-    "react": ">=16.8.0"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    },
-    "next": {
-      "optional": true
-    }
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.5",
-    "@size-limit/preset-small-lib": "^11.2.0",
-    "@testing-library/jest-dom": "^6.8.0",
-    "@testing-library/react": "^14.0.0",
-    "@types/node": "^20.9.0",
-    "@types/react": "^18.2.37",
-    "@typescript-eslint/eslint-plugin": "^8.44.0",
-    "@typescript-eslint/parser": "^8.44.0",
-    "@vitest/ui": "^3.2.4",
-    "audit-ci": "^7.0.1",
-    "eslint": "^9.35.0",
-    "globals": "^16.4.0",
-    "jsdom": "^22.1.0",
-    "rollup": "^4.4.0",
-    "rollup-plugin-dts": "^6.1.0",
-    "size-limit": "^11.2.0",
-    "tslib": "^2.6.2",
-    "typescript": "^5.2.2",
-    "vitest": "^3.2.4",
-    "webidl-conversions": "^7.0.0",
-    "whatwg-url": "^11.0.0"
+  "homepage": "https://github.com/dolasoft/dolasoft-logger#readme",
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
