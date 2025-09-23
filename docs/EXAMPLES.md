@@ -16,9 +16,10 @@ This document contains comprehensive examples demonstrating various use cases an
 ### Simple Logging with Singleton
 
 ```javascript
-const { logger } = require('@dolasoftfree/logger');
+const { getLogger } = require('@dolasoftfree/logger');
 
-// Use the default singleton instance
+// Get the logger instance
+const logger = getLogger();
 logger.info('Application started');
 logger.debug('Debug information', { module: 'example', version: '1.0.0' });
 logger.warn('This is a warning', { threshold: 0.8 });
@@ -51,7 +52,9 @@ logger.info('User login attempt', {
 ### Trace Sessions
 
 ```javascript
-const { logger } = require('@dolasoftfree/logger');
+const { getLogger } = require('@dolasoftfree/logger');
+
+const logger = getLogger();
 
 // Start a trace session
 logger.startSession('example-session-1', 'trace', { 
@@ -82,7 +85,9 @@ console.log(`Steps completed: ${session.steps.length}`);
 ### Execution Sessions
 
 ```javascript
-const { logger } = require('@dolasoftfree/logger');
+const { getLogger } = require('@dolasoftfree/logger');
+
+const logger = getLogger();
 
 logger.startSession('execution-example', 'execution');
 
@@ -194,7 +199,9 @@ console.log(`Order processing took: ${session.totalDuration}ms`);
 ### API Request Monitoring
 
 ```javascript
-const { logger } = require('@dolasoftfree/logger');
+const { getLogger } = require('@dolasoftfree/logger');
+
+const logger = getLogger();
 
 // Middleware for Express.js
 app.use((req, res, next) => {
@@ -350,7 +357,9 @@ describe('MyService', () => {
 ### Async Operation Tracking
 
 ```javascript
-const { logger } = require('@dolasoftfree/logger');
+const { getLogger } = require('@dolasoftfree/logger');
+
+const logger = getLogger();
 
 class AsyncOperationTracker {
   async trackOperation(name, operation) {
@@ -407,7 +416,9 @@ class ConditionalLogger {
 ### Structured Error Logging
 
 ```javascript
-const { logger } = require('@dolasoftfree/logger');
+const { getLogger } = require('@dolasoftfree/logger');
+
+const logger = getLogger();
 
 class ErrorLogger {
   logError(error, context = {}) {
@@ -440,7 +451,9 @@ class ErrorLogger {
 ### Performance Monitoring
 
 ```javascript
-const { logger } = require('@dolasoftfree/logger');
+const { getLogger } = require('@dolasoftfree/logger');
+
+const logger = getLogger();
 
 class PerformanceMonitor {
   constructor() {
@@ -492,9 +505,10 @@ class PerformanceMonitor {
 ## TypeScript Usage
 
 ```typescript
-import { logger, UnifiedLogger, LOG_MODES, LogEntry, Session } from '@dolasoftfree/logger';
+import { getLogger, UnifiedLogger, LOG_MODES, LogEntry, Session } from '@dolasoftfree/logger';
 
-// Using the singleton
+// Get the logger instance
+const logger = getLogger();
 logger.info('TypeScript example');
 
 // Custom configuration with type safety

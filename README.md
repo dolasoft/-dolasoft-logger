@@ -1,5 +1,10 @@
 # @dolasoftfree/logger
 
+[![npm version](https://img.shields.io/npm/v/@dolasoftfree/logger.svg)](https://www.npmjs.com/package/@dolasoftfree/logger)
+[![npm downloads](https://img.shields.io/npm/dm/@dolasoftfree/logger.svg)](https://www.npmjs.com/package/@dolasoftfree/logger)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/@dolasoftfree/logger)](https://bundlephobia.com/package/@dolasoftfree/logger)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A comprehensive logging system that combines execution tracking, trace logging, and general logging capabilities into a single, unified interface with automatic production safety.
 
 ## Features

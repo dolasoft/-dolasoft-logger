@@ -47,12 +47,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dolasoft/dolasoft-logger.git"
+    "url": "git+https://github.com/dolasoft/-dolasoft-logger.git"
   },
   "bugs": {
-    "url": "https://github.com/dolasoft/dolasoft-logger/issues"
+    "url": "https://github.com/dolasoft/-dolasoft-logger/issues"
   },
-  "homepage": "https://github.com/dolasoft/dolasoft-logger#readme",
+  "homepage": "https://github.com/dolasoft/-dolasoft-logger#readme",
   "engines": {
     "node": ">=14.0.0"
   }
