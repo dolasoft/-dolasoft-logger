@@ -422,7 +422,7 @@ describe('UnifiedLogger', () => {
     it('should complete execution steps', async () => {
       logger.startStep('step2', 'Second step');
 
-      await new Promise(resolve => setTimeout(resolve, 30));
+      await new Promise(resolve => setTimeout(resolve, 35));
 
       logger.completeStep('step2', { result: 'success' });
 
