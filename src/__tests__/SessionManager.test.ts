@@ -60,23 +60,21 @@ describe('SessionManager', () => {
       expect(session?.id).toBe('test-id');
     });
 
-    it('should get all sessions sorted by start time', () => {
+    it('should get all sessions sorted by start time', async () => {
       sessionManager.startSession('session-1', 'trace');
       sessionManager.endSession();
 
-      // Small delay to ensure different timestamps
-      setTimeout(() => {
-        sessionManager.startSession('session-2', 'execution');
-        sessionManager.endSession();
-      }, 10);
+      // Ensure different timestamps - use a longer delay for CI environments
+      await new Promise(resolve => setTimeout(resolve, 50));
 
-      setTimeout(() => {
-        const sessions = sessionManager.getAllSessions();
-        expect(sessions).toHaveLength(2);
-        // Most recent first
-        expect(sessions[0].id).toBe('session-2');
-        expect(sessions[1].id).toBe('session-1');
-      }, 20);
+      sessionManager.startSession('session-2', 'execution');
+      sessionManager.endSession();
+
+      const sessions = sessionManager.getAllSessions();
+      expect(sessions).toHaveLength(2);
+      // Most recent first
+      expect(sessions[0].id).toBe('session-2');
+      expect(sessions[1].id).toBe('session-1');
     });
 
     it('should limit stored sessions to maxSessions', () => {
