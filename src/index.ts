@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   LogLevel,
   LogEntry,
@@ -174,7 +173,7 @@ export class UnifiedLogger {
   }
 
   private writeToConsole(
-    level: string,
+    level: LogLevel['level'],
     message: string,
     context?: unknown,
     metadata?: unknown
@@ -184,16 +183,19 @@ export class UnifiedLogger {
     // Sanitize context and metadata before logging
     const sanitizedContext = this.sanitizeData(context);
     const sanitizedMetadata = this.sanitizeData(metadata);
-
-    if (level === 'error') {
-      console.error(output, sanitizedContext, sanitizedMetadata);
-    } else if (level === 'warn') {
-      console.warn(output, sanitizedContext, sanitizedMetadata);
-    } else if (level === 'debug') {
-      console.debug(output, sanitizedContext, sanitizedMetadata);
-    } else {
-      console.log(output, sanitizedContext, sanitizedMetadata);
-    }
+    type ConsoleMethod = 'log' | 'debug' | 'warn' | 'error';
+    const methodMap: Record<LogLevel['level'], ConsoleMethod> = {
+      debug: 'debug',
+      info: 'log',
+      warn: 'warn',
+      error: 'error',
+    };
+    const method: ConsoleMethod = methodMap[level];
+    (console as Pick<Console, ConsoleMethod>)[method](
+      output,
+      sanitizedContext,
+      sanitizedMetadata
+    );
   }
 
   // ===== Session Management =====
