@@ -115,6 +115,9 @@ describe('Production Safety Features', () => {
       process.env.LOG_MODE = 'route';
       process.env.NODE_ENV = 'production';
 
+      // Mock fetch for route mode
+      global.fetch = vi.fn().mockResolvedValue({ ok: true });
+
       const logger = UnifiedLogger.getInstance();
 
       logger.info('Should not log to console');

@@ -287,9 +287,7 @@ describe('Integration Tests', () => {
       });
 
       // Mock fetch to always fail
-      vi.mocked(fetch).mockImplementation(() => {
-        throw new Error('Fetch is not defined');
-      });
+      vi.mocked(fetch).mockRejectedValue(new Error('Fetch is not defined'));
 
       // Should still log to console
       expect(() => {
