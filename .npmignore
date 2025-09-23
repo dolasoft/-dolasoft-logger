@@ -24,7 +24,6 @@ docs/
 # Development
 node_modules/
 coverage/
-.nyc_output/
 
 # Build artifacts
 *.tsbuildinfo
