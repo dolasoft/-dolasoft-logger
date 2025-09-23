@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:prod": "npm run clean && tsc --declaration --declarationMap false",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run lint && npm run type-check && npm run test && npm run build",
